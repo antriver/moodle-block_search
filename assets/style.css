@@ -12,13 +12,21 @@
 #block_search #searchForm {
 	display: block;
 	margin:0 0 20px 0;
+	text-align:center;
 }
-
 	#block_search #searchForm > * {
 		box-sizing: border-box;
 		-webkit-box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		padding:10px;
+	}
+	
+	#block_search #searchForm > label {
+		font-size:12px;
+		display:inline-block;
+		margin-top:5px;
+		padding-bottom:0;
+		cursor:pointer;
 	}
 
 	#block_search #searchForm input[type=text] {

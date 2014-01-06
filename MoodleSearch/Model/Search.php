@@ -4,19 +4,18 @@
 * Class for performing a search in all courses, categories an modules
 */
 
-namespace MoodleSearch;
+namespace MoodleSearch\Model;
 
 class Search
 {
-
 	private $q = false;
-	private $debug = false;
+	private $courseID = false;	
 	private $tables = false;
 
-	public function __construct($q, $debug = false)
+	public function __construct($q, $courseID = false)
 	{
 		$this->q = $q;
-		$this->debug = $debug;
+		$this->courseID = $courseID;
 		$this->tables = $this->getFieldsToSearch();
 	}
 
@@ -25,11 +24,13 @@ class Search
 	{
 		global $DB;
 		
-		//Courses and categories
-		$tables = array(
-			'course_categories' => array('name'),
-			'course' => array('fullname', 'shortname'),
-		);
+		if (!$this->courseID) {
+			//Courses and categories
+			$tables = array(
+				'course_categories' => array('name'),
+				'course' => array('fullname', 'shortname'),
+			);
+		}
 
 		//Database manager object
 		$dbman = $DB->get_manager();
@@ -81,6 +82,12 @@ class Search
 			throw new \Exception('Trying to search, but no tables have been specified to search in.');
 		}
 		
+		$hash = md5('search'.$q.'courseid'.$this->courseID);
+		
+		if ($results = \MoodleSearch\Data::getCache()->get($hash)) {
+			//return $results;
+		}
+		
 		global $DB;
 		
 		$results = array();
@@ -90,24 +97,27 @@ class Search
 		//Search each table we're supposed to search in
 		foreach ($this->tables as $table => $fields) {
 		
+			$where = '';
+		
 			//Array of query values
 			$values = array();
 			
 			//Build the SQL query
-			$where = '';
 			foreach ($fields as $fieldName) {
 				$where .= ' OR LOWER(' . $fieldName . ') SIMILAR TO ?';
 				$values[] = $q;
 			}
 			$where = ltrim($where, ' OR ');
+			
+			if ($this->courseID) {
+				$where = "({$where})";
+				$where .= ' AND course = ?';
+				$values[] = $this->courseID; 
+			}
 		
 			//Full query
 			$sql = 'SELECT * FROM {' . $table . '} WHERE ' . $where;
-
-			if ($this->debug) {
-				echo "\n" . $sql;
-			}
-		
+			
 			//Run the query and return the matched rows
 			$results[$table] = $DB->get_records_sql($sql, $values);
 		}
@@ -123,6 +133,8 @@ class Search
 				$row = new Result($tableName, $row);
 			}
 		}
+		
+		\MoodleSearch\Data::getCache()->set($hash, $results);
 		
 		return $results;
 	}

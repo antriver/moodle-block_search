@@ -24,7 +24,7 @@ class Block
 		return $CFG->wwwroot . $this->path;
 	}
 
-	public function getSearchBox($q = false)
+	public function getSearchBox($q = false, $courseID = false)
 	{
 		global $SITE;
 		
@@ -53,6 +53,29 @@ class Block
 				\html_writer::tag('i', '', array('class' => 'icon-search')) . ' Search',
 				array('class' => 'searchButton')
 			);
+			
+			if ($courseID) {
+			
+				$r .= \html_writer::tag(
+					'label', 			
+					\html_writer::empty_tag('input', array(
+						'type' => 'radio',
+						'name' => 'courseID',
+						'value' => 0
+					)) . 'Search all of '. $SITE->shortname
+				);
+
+				$r .= \html_writer::tag(
+					'label', 			
+					\html_writer::empty_tag('input', array(
+						'type' => 'radio',
+						'name' => 'courseID',
+						'value' => $courseID,
+						'checked' => 'checked'
+					)) . 'Search in ' . \MoodleSearch\Data::getCourseName($courseID)
+				);				
+				
+			}
 		
 		$r .= \html_writer::end_tag('form');
 

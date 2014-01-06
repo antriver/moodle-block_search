@@ -4,7 +4,7 @@
 * A model for a search result
 */
 
-namespace MoodleSearch;
+namespace MoodleSearch\Model;
 
 class Result
 {
@@ -27,11 +27,6 @@ class Result
 		}
 	}
 	
-	public function icon()
-	{
-	
-	}
-	
 	public function description()
 	{
 		$d = $this->row->intro;
@@ -49,23 +44,11 @@ class Result
 				return '/course/view.php?id=' . $this->row->id;
 				
 			default:
-				$resourceID = $this->getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
+				$resourceID = \MoodleSearch\Data::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
 				return '/mod/' . $this->tableName . '/view.php?id=' . $resourceID;
 		}
 	}
 
-	//Returns the unique instance ID for a resource across all of moodle, from the given ID which is unique to that module	
-	private function getGlobalInstanceIDFromModuleInstanceID($moduleName, $moduleInstanceID)
-	{
-		global $DB;
-		return $DB->get_field('course_modules', 'id', array('module' => $this->getModuleID($moduleName), 'instance' => $moduleInstanceID));
-	}
-	
-	private function getModuleID($moduleName)
-	{
-		global $DB;
-		return $DB->get_field('modules', 'id', array('name' => $moduleName));
-	}
 	
 	//Returns an array with the path to this row
 	// e.g. Teaching & Learning > English > English (7) > Activity Name
@@ -89,20 +72,14 @@ class Result
 				return $this->getCategoryPath($this->row->category);
 				break;
 				
-			//Modules
+			//Resources in courses
 			default:
 			
 				//Get all info for the course this resource is in
-				$course = $DB->get_record('course', array('id' => $this->row->course));
+				$course = \MoodleSearch\Data::getCourse($this->row->course);
 				
-				//Get the id of the resource's module
-				$pluginID = $this->getModuleID($this->tableName);
-				
-				//Get the sectionID the resource is in
-				$sectionID = $DB->get_field('course_modules', 'section', array('module' => $pluginID, 'instance' => $this->row->id));
-				
-				//Get the name of the section
-				$sectionName = $DB->get_field('course_sections', 'name', array('id' => $sectionID));
+				//Get all info for the course section this resource is in
+				$section = \MoodleSearch\Data::getResourceSection($this->tableName, $this->row->id);
 				
 				$path = $this->getCategoryPath($course->category);
 				$courseIcon = course_get_icon($course->id);
@@ -114,8 +91,8 @@ class Result
 				);
 				$path[] = array(
 					'title' => 'Section',
-					'name' => $sectionName,
-					'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $sectionID,
+					'name' => $section->name,
+					'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
 					'icon' => 'icon-th'
 				);
 				return $path;
