@@ -4,24 +4,22 @@
 * Class for performing a search in all courses, categories an modules
 */
 
-class MoodleSearch
+namespace MoodleSearch;
+
+class Search
 {
 
+	private $q = false;
 	private $debug = false;
 	private $tables = false;
 
-	public function __construct($debug = false)
+	public function __construct($q, $debug = false)
 	{
+		$this->q = $q;
 		$this->debug = $debug;
 		$this->tables = $this->getFieldsToSearch();
 	}
 
-	//Perform a search for the given string
-	public function search($q)
-	{
-		return $this->getResults($q);
-	}
-	
 	//Builds an associative array of which fields in which tables to search in
 	private function getFieldsToSearch()
 	{
@@ -42,7 +40,7 @@ class MoodleSearch
 		foreach ($modules as $module) {
 		
 			//Create an xmldb object from the name of this table
-			$table = new xmldb_table($module->name);
+			$table = new \xmldb_table($module->name);
 		
 			//Skip this module if it has no table
 			//(Only checks if a table with the same name as the module exists)
@@ -57,7 +55,7 @@ class MoodleSearch
 			foreach ($moduleFields as $fieldName) {
 	
 				//Create an xmldb object for this field's name
-				$field = new xmldb_field($fieldName);
+				$field = new \xmldb_field($fieldName);
 				
 				//If this field exists in the table, we're going to search in it
 				if ($dbman->field_exists($table, $field)) {
@@ -73,16 +71,20 @@ class MoodleSearch
 	
 	//Search for rows which match the search query
 	//Returns an associative array of the tables that were searched
-	function getResults($q)
+	public function getResults()
 	{
-		global $DB;
-		
+		if (empty($this->q)) {
+			throw new \Exception('No query was given.');
+		}
+	
 		if (empty($this->tables)) {
-			throw new Exception('Trying to search, but no tables have been specified to search in.');
+			throw new \Exception('Trying to search, but no tables have been specified to search in.');
 		}
 		
+		global $DB;
+		
 		$results = array();
-		$q = strtolower($q);
+		$q = strtolower($this->q);
 		$q = "%{$q}%";
 		
 		//Search each table we're supposed to search in
@@ -110,8 +112,18 @@ class MoodleSearch
 			$results[$table] = $DB->get_records_sql($sql, $values);
 		}
 		
+		if (count($results) < 1) {
+			return $results;
+		}
+		
+		require_once __DIR__ . '/Result.php';
+		
+		foreach ($results as $tableName => &$tableResults) {
+			foreach ($tableResults as &$row) {
+				$row = new Result($tableName, $row);
+			}
+		}
+		
 		return $results;
 	}
-	
-
 }
