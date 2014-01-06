@@ -29,3 +29,4 @@ $string['labelfoo'] = 'Config label';
 $string['search:addinstance'] = 'Add a search block';
 $string['search:myaddinstance'] = 'Add a search block to my moodle';
 $string['pluginname'] = 'Search';
+$string['pagetitle'] = 'Search';
