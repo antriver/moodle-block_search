@@ -193,8 +193,9 @@ class Block
 			$r .= \html_writer::tag('a', $sectionIcon . $result->name(), array('class' => 'resultLink', 'href' => $result->url()));
 			
 			if ($d = $result->description()) {
-				$r .= $d; //Description looks like it is already wrapped in <p> tags
-				//$r .= \html_writer::tag('p', $d);
+				$d = strip_tags($d);
+				$d = $this->wordTruncate($d, 350);
+				$r .= \html_writer::tag('p', $d);
 			}
 		
 		$r .= \html_writer::end_tag('li');
@@ -212,4 +213,34 @@ class Block
 		}
 		return $r;
 	}
+	
+	/**
+	 * Truncate string to a certain length, but cut at the nearest word instead of cutting words in half
+	 * @param    string $string        Text to truncate
+	 * @param    int    $limit         Maximum length
+	 * @param    string $cutter        Sting to append to text if it gets truncated
+	 * @return string    Truncated text
+	 */
+	function wordTruncate($string, $limit, $cutter = '...')
+	{
+		if (strlen($string) <= $limit) {
+			return $string;
+		}
+	
+		$limit -= strlen($cutter);
+	
+		$string = substr($string, 0, $limit);
+		$string = trim($string, " ,.");
+	
+		$breakpoint = strrpos($string, ' '); //Find last space in truncated string
+	
+		if ($breakpoint === false) {
+			return $string.$cutter;
+		} else {
+			$string = substr($string, 0, $breakpoint);
+			$string = trim($string, " ,.");
+			return $string.$cutter;
+		}
+	}
+	
 }

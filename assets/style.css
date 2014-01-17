@@ -114,6 +114,12 @@
 		
 /* Full search results on right */
 
+#block_search #results h3 {
+	margin-top:30px;
+}
+	#block_search #results h3:first-child {
+		margin-top:0;
+	}
 
 #block_search #results img.icon {
 	position: relative;
