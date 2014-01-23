@@ -21,17 +21,24 @@
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+//General blockyness
 $string['pluginname'] = 'Search';
 $string['pagetitle'] = 'Search';
 
-$string['selectall'] = 'Select All';
+//Placeholder text for the search box when shown in a block on a page
+$string['search_input_text_block'] = 'Search this course';
 
+//Placeholder text for the search box when shown on the full search page
+$string['search_input_text_page'] = 'Find courses, activities, or documents';
+
+$string['include_hidden_results'] = 'Include results I don\'t have access to';
+
+//Admin settings
 $string['settings_search_tables_name'] = 'Search Tables';
 $string['settings_search_tables_desc'] = 'Which tables in the database will be searched.';
-
+$string['selectall'] = 'Select All';
 $string['settings_cache_results_name'] = 'Cache Results For';
 $string['settings_cache_results_desc'] = 'How long (in settings) to cache search results for. 0 mean no caching. Default is 1 day.';
 
 //Capabilities
 $string['search:search'] = 'Perform a search';
-#$string['search:managesettings'] = 'Modify search settings';

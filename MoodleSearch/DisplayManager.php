@@ -32,7 +32,7 @@ class DisplayManager
 		$this->block = $block;
 	}
 
-	public function showSearchBox($q = false, $courseID = false, $showAllResults = false)
+	public function showSearchBox($q = false, $courseID = false, $showAllResults = false, $showOptions = true, $placeholderText = null)
 	{
 		global $SITE;
 	
@@ -42,7 +42,7 @@ class DisplayManager
 			array(
 				'action' => $this->block->getFullURL(),
 				'method' => 'get',
-				'id' => 'searchForm'
+				'class' => 'searchBlockForm'
 			)
 		);
 		
@@ -51,9 +51,9 @@ class DisplayManager
 				'input',
 				array(
 					'type' => 'text',
-					'placeholder' => 'Find courses, activities, or documents on ' . $SITE->shortname,
+					'placeholder' => $placeholderText !== null ? $placeholderText : get_string('search_input_text_page', 'block_search'),
 					'value' => $q,
-					'id' => 'searchInput',
+					'class' => 'searchBlockInput',
 					'name' => 'q'
 				)
 			);
@@ -65,48 +65,57 @@ class DisplayManager
 				array('class' => 'searchButton')
 			);
 			
-			$r .= '<strong>' . \html_writer::tag('i', '', array('class' => 'icon-cogs')) . ' Search Options:</strong>';
+			if ($showOptions) {
 			
-			//If courseID is in the URL, show options to search this course or everywhere
-			if ($courseID) {
-			
-				$r .= \html_writer::tag(
-					'label', 			
-					\html_writer::empty_tag('input', array(
-						'type' => 'radio',
-						'name' => 'courseID',
-						'value' => 0,
-					)) . 'Search all of '. $SITE->shortname
-				);
-
-				$r .= \html_writer::tag(
-					'label', 			
-					\html_writer::empty_tag('input', array(
-						'type' => 'radio',
-						'name' => 'courseID',
-						'value' => $courseID,
-						'checked' => 'checked'
-					)) . 'Search in ' . \MoodleSearch\Data::getCourseName($courseID)
-				);				
+				$r .= '<strong>' . \html_writer::tag('i', '', array('class' => 'icon-cogs')) . ' Search Options:</strong>';
 				
-			}
-			
-			//"Show hidden results" button
-			
-			//We need to make this an array so 'checked' can only be added if necessary
-			$checkboxAttributes = array(
-				'type' => 'checkbox',
-				'name' => 'showHiddenResults',
-				'value' => 1,
-			);
-			if ($showAllResults) {
-				$checkboxAttributes['checked'] = 'checked';
-			}
-			
-			$r .= \html_writer::tag(
-					'label', 			
-					\html_writer::empty_tag('input', $checkboxAttributes) . 'Include results from courses I\'m not enroled in'
+				//If courseID is in the URL, show options to search this course or everywhere
+				if ($courseID) {
+				
+					$r .= \html_writer::tag(
+						'label', 			
+						\html_writer::empty_tag('input', array(
+							'type' => 'radio',
+							'name' => 'courseID',
+							'value' => 0,
+						)) . 'Search all of '. $SITE->shortname
+					);
+	
+					$r .= \html_writer::tag(
+						'label', 			
+						\html_writer::empty_tag('input', array(
+							'type' => 'radio',
+							'name' => 'courseID',
+							'value' => $courseID,
+							'checked' => 'checked'
+						)) . 'Search in ' . \MoodleSearch\DataManager::getCourseName($courseID)
+					);				
+					
+				}
+				
+				//"Show hidden results" button
+				
+				//We need to make this an array so 'checked' can only be added if necessary
+				$checkboxAttributes = array(
+					'type' => 'checkbox',
+					'name' => 'showHiddenResults',
+					'value' => 1,
 				);
+				if ($showAllResults) {
+					$checkboxAttributes['checked'] = 'checked';
+				}
+				
+				$r .= \html_writer::tag(
+						'label', 			
+						\html_writer::empty_tag('input', $checkboxAttributes) . get_string('include_hidden_results', 'block_search')
+					);
+					
+			} else if ($courseID) {
+				
+				//If we're not showing the options, but have a courseID we still need to add that to the form
+				$r .= \html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'courseID', 'value' => $courseID));
+			
+			}
 		
 		$r .= \html_writer::end_tag('form');
 

@@ -37,7 +37,6 @@ class Search
 	{
 		$this->q = $q;
 		$this->courseID = $courseID;
-		$this->tables = $this->getFieldsToSearch();
 		$this->results = $this->runSearch();
 	}
 	
@@ -118,6 +117,8 @@ class Search
 		if (empty($this->q)) {
 			throw new \Exception('No query was given.');
 		}
+	
+		$this->tables = $this->getFieldsToSearch();
 	
 		if (empty($this->tables)) {
 			throw new \Exception('Trying to search, but no tables have been specified to search in.');

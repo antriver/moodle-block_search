@@ -28,46 +28,27 @@ class block_search extends block_base
 
 	public function init()
 	{
-		$this->title = get_string('pluginname', 'block_search');
+		if (!empty($this->page->course)) {
+			$this->title = get_string('searchverb', 'block_search') . $this->page->course->fullname;
+		} else {
+			$this->title = get_string('pluginname', 'block_search');
+		}
 	}
 
+	//Set the content of the block when displayed as a block on a page
 	public function get_content()
 	{
-		global $CFG, $OUTPUT;
-
-		if ($this->content !== null) {
-			return $this->content;
-		}
-
-		if (empty($this->instance)) {
-			$this->content = '';
-			return $this->content;
-		}
-
-		$this->content = new stdClass();
-		$this->content->items = array();
-		$this->content->icons = array();
-		$this->content->footer = '';
-
-		// user/index.php expect course context, so get one if page has module context.
-		$currentcontext = $this->page->context->get_course_context(false);
-
-		if (!empty($this->config->text)) {
-			$this->content->text = $this->config->text;
-		}
-
-		$this->content = '';
-		if (empty($currentcontext)) {
-			return $this->content;
-		}
-		if ($this->page->course->id == SITEID) {
-			$this->context->text .= "site context";
-		}
-
-		if (!empty($this->config->text)) {
-			$this->content->text .= $this->config->text;
-		}
-
+		global $CFG, $OUTPUT, $PAGE;
+	
+		//Include the CSS for the block
+		$PAGE->requires->css('/blocks/search/assets/css/block.css');
+		
+		require_once dirname(__FILE__) . '/MoodleSearch/Block.php';
+		$searchBlock = new \MoodleSearch\Block();
+		
+		$this->content = new stdClass;
+		$this->content->text = $searchBlock->display->showSearchBox($_GET['q'], $this->page->course->id, false, false, get_string('search_input_text_block', 'block_search'));
+		
 		return $this->content;
 	}
 

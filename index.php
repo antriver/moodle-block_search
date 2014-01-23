@@ -42,6 +42,7 @@ if ($courseID) {
 }
 
 $PAGE->set_url('/blocks/search');
+$PAGE->requires->css('/blocks/search/assets/css/page.css');
 
 //Page title
 if (!empty($q)) {
@@ -55,9 +56,6 @@ $PAGE->set_heading(get_string('pagetitle', $searchBlock->blockName));
 echo $OUTPUT->header();
 echo html_writer::start_tag('div', array('id' => $searchBlock->blockName));
 
-//Add the CSS
-//TODO: Is there a nicer way to do this than just echoing here?
-echo '<link rel="stylesheet" type="text/css" href="' . $searchBlock->getFullURL() . 'assets/css/style.css" />';
 
 echo $searchBlock->display->showSearchBox($q, $courseID, $showHiddenResults);
 	

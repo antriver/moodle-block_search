@@ -1,0 +1,29 @@
+/* Styles used by the search block when displayed as a block on a normal Moodle page */
+
+.searchBlockForm > * {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	padding:3px;
+}
+
+.searchBlockForm > label {
+	font-size:12px;
+	display:inline-block;
+	margin-top:5px;
+	padding-bottom:0;
+	cursor:pointer;
+}
+
+.searchBlockForm input[type=text] {
+	width:68%;
+	margin-right:2%;
+	font-size:13px;
+}
+
+.searchBlockForm button {
+	width:30%;
+	font-size:13px;
+	margin-top: -3px;
+	padding: 4px;
+}
