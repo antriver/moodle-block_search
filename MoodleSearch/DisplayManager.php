@@ -32,11 +32,16 @@ class DisplayManager
 		$this->block = $block;
 	}
 
-	public function showSearchBox($q = false, $courseID = false, $showAllResults = false, $showOptions = true, $placeholderText = null)
-	{
+	public function showSearchBox(
+		$q = false,
+		$courseID = false,
+		$showAllResults = false,
+		$showOptions = true,
+		$placeholderText = null
+	) {
 		global $SITE;
 	
-		//Begin form	
+		//Begin form
 		$r = \html_writer::start_tag(
 			'form',
 			array(
@@ -46,76 +51,93 @@ class DisplayManager
 			)
 		);
 		
-			//Input box
+		if ($paceholderText === null) {
+			$placeholderText = get_string('search_input_text_page', 'block_search');
+		}
+		
+		//Input box
+		$r .= \html_writer::empty_tag(
+			'input',
+			array(
+				'type' => 'text',
+				'placeholder' => $placeholderText,
+				'value' => $q,
+				'class' => 'searchBlockInput',
+				'name' => 'q'
+			)
+		);
+		
+		//Search Button
+		$icon = \html_writer::tag('i', '', array('class' => 'icon-search'));
+		$r .= \html_writer::tag(
+			'button',
+			$icon . ' ' . get_string('search', 'block_search'),
+			array('class' => 'searchButton')
+		);
+		
+		if ($showOptions) {
+		
+			$icon = \html_writer::tag('i', '', array('class' => 'icon-cogs'));
+			$r .= '<strong>' . $icon . ' ' . get_string('search_options', 'block_search') . '</strong>';
+			
+			//If courseID is in the URL, show options to search this course or everywhere
+			if ($courseID) {
+			
+				$r .= \html_writer::tag(
+					'label',
+					\html_writer::empty_tag('input', array(
+						'type' => 'radio',
+						'name' => 'courseID',
+						'value' => 0,
+					)) . get_string('search_all_of_site', 'block_search', $SITE->shortname)
+				);
+
+				$courseName = \MoodleSearch\DataManager::getCourseName($courseID);
+				$r .= \html_writer::tag(
+					'label',
+					\html_writer::empty_tag('input', array(
+						'type' => 'radio',
+						'name' => 'courseID',
+						'value' => $courseID,
+						'checked' => 'checked'
+					)) . get_string('search_in_course', 'block_search', $courseName)
+				);
+				
+			}
+			
+			//"Show hidden results" button
+			
+			//We need to make this an array so 'checked' can only be added if necessary
+			$checkboxAttributes = array(
+				'type' => 'checkbox',
+				'name' => 'showHiddenResults',
+				'value' => 1,
+			);
+			
+			if ($showAllResults) {
+				$checkboxAttributes['checked'] = 'checked';
+			}
+			
+			$checkbox = \html_writer::empty_tag('input', $checkboxAttributes);
+			
+			$r .= \html_writer::tag(
+				'label',
+				$checkbox . get_string('include_hidden_results', 'block_search')
+			);
+				
+		} elseif ($courseID) {
+			
+			//If we're not showing the options, but have a courseID we still need to add that to the form
 			$r .= \html_writer::empty_tag(
 				'input',
 				array(
-					'type' => 'text',
-					'placeholder' => $placeholderText !== null ? $placeholderText : get_string('search_input_text_page', 'block_search'),
-					'value' => $q,
-					'class' => 'searchBlockInput',
-					'name' => 'q'
+					'type' => 'hidden',
+					'name' => 'courseID',
+					'value' => $courseID
 				)
 			);
-			
-			//Search Button
-			$r .= \html_writer::tag(
-				'button',
-				\html_writer::tag('i', '', array('class' => 'icon-search')) . ' ' . get_string('search', 'block_search'),
-				array('class' => 'searchButton')
-			);
-			
-			if ($showOptions) {
-			
-				$r .= '<strong>' . \html_writer::tag('i', '', array('class' => 'icon-cogs')) . ' ' . get_string('search_options', 'block_search') . '</strong>';
-				
-				//If courseID is in the URL, show options to search this course or everywhere
-				if ($courseID) {
-				
-					$r .= \html_writer::tag(
-						'label', 			
-						\html_writer::empty_tag('input', array(
-							'type' => 'radio',
-							'name' => 'courseID',
-							'value' => 0,
-						)) . get_string('search_all_of_site', 'block_search', $SITE->shortname)
-					);
-	
-					$r .= \html_writer::tag(
-						'label', 			
-						\html_writer::empty_tag('input', array(
-							'type' => 'radio',
-							'name' => 'courseID',
-							'value' => $courseID,
-							'checked' => 'checked'
-						)) . get_string('search_in_course', 'block_search', \MoodleSearch\DataManager::getCourseName($courseID))
-					);				
-					
-				}
-				
-				//"Show hidden results" button
-				
-				//We need to make this an array so 'checked' can only be added if necessary
-				$checkboxAttributes = array(
-					'type' => 'checkbox',
-					'name' => 'showHiddenResults',
-					'value' => 1,
-				);
-				if ($showAllResults) {
-					$checkboxAttributes['checked'] = 'checked';
-				}
-				
-				$r .= \html_writer::tag(
-						'label', 			
-						\html_writer::empty_tag('input', $checkboxAttributes) . get_string('include_hidden_results', 'block_search')
-					);
-					
-			} else if ($courseID) {
-				
-				//If we're not showing the options, but have a courseID we still need to add that to the form
-				$r .= \html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'courseID', 'value' => $courseID));
-			
-			}
+		
+		}
 		
 		$r .= \html_writer::end_tag('form');
 
@@ -153,7 +175,7 @@ class DisplayManager
 		}
 		
 		$r .= \html_writer::end_tag('ul');
-		$r .= \html_writer::end_tag('div');		
+		$r .= \html_writer::end_tag('div');
 		$r .= \html_writer::end_tag('div');
 		
 		return $r;
@@ -190,7 +212,8 @@ class DisplayManager
 	
 	//Takes the name of a table and returns a nice human readable name
 	//Mostly this replaces a module name (which is also a table name) with the title of that module
-	private function tableName($tableName) {
+	private function tableName($tableName)
+	{
 		global $OUTPUT;
 		
 		switch ($tableName) {
@@ -205,9 +228,9 @@ class DisplayManager
 					'title' => get_string('courses', 'moodle'),
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-archive'))
 				);
-				break;		
+				break;
 			default:
-				if ($pluginName = get_string('pluginname' , "mod_{$tableName}")) {
+				if ($pluginName = get_string('pluginname', "mod_{$tableName}")) {
 					return array(
 						'title' => $pluginName,
 						'icon' => trim($OUTPUT->pix_icon('icon', '', $tableName, array('class' => 'icon')))
@@ -233,29 +256,38 @@ class DisplayManager
 		
 		$r = \html_writer::start_tag('li', array('class' => $liClasses));
 		
-			//Show the path
-			$r .= \html_writer::tag('ul', $this->showPath($result->path()), array('class' => 'path'));
-			
-			if (!empty($result->hiddenReason)) {
-				if ($result->hiddenReason == 'notenrolled') {
-					$niceHiddenReason = get_string('hidden_not_enrolled', 'block_search');
-				} else if ($result->hiddenReason == 'notvisible') {
-					$niceHiddenReason = get_string('hidden_not_available', 'block_search');
-				}
-				$r .= \html_writer::tag(
-					'h5', 
-					 \html_writer::tag('i', '', array('class' => 'icon icon-remove')) . ' ' .$niceHiddenReason,
-					array('class' => 'hiddenReason')
-				);
+		//Show the path
+		$r .= \html_writer::tag('ul', $this->showPath($result->path()), array('class' => 'path'));
+		
+		if (!empty($result->hiddenReason)) {
+			if ($result->hiddenReason == 'notenrolled') {
+				$niceHiddenReason = get_string('hidden_not_enrolled', 'block_search');
+			} elseif ($result->hiddenReason == 'notvisible') {
+				$niceHiddenReason = get_string('hidden_not_available', 'block_search');
 			}
 			
-			$r .= \html_writer::tag('a', $sectionIcon . $result->name(), array('class' => 'resultLink', 'href' => $result->url()));
-			
-			if ($d = $result->description()) {
-				$d = strip_tags($d);
-				$d = $this->wordTruncate($d, 350);
-				$r .= \html_writer::tag('p', $d);
-			}
+			$icon = \html_writer::tag('i', '', array('class' => 'icon icon-remove'));
+			$r .= \html_writer::tag(
+				'h5',
+				$icon . ' ' .$niceHiddenReason,
+				array('class' => 'hiddenReason')
+			);
+		}
+		
+		$r .= \html_writer::tag(
+			'a',
+			$sectionIcon . $result->name(),
+			array(
+				'class' => 'resultLink',
+				'href' => $result->url()
+			)
+		);
+		
+		if ($d = $result->description()) {
+			$d = strip_tags($d);
+			$d = $this->wordTruncate($d, 350);
+			$r .= \html_writer::tag('p', $d);
+		}
 		
 		$r .= \html_writer::end_tag('li');
 		
@@ -267,7 +299,14 @@ class DisplayManager
 		$r = '';
 		foreach ($path as $item) {
 			$icon = \html_writer::tag('i', '', array('class' => $item['icon']));
-			$a = \html_writer::tag('a', $icon . ' ' .$item['name'], array('href' => $item['url'], 'title' => $item['title']));
+			$a = \html_writer::tag(
+				'a',
+				$icon . ' ' . $item['name'],
+				array(
+					'href' => $item['url'],
+					'title' => $item['title']
+				)
+			);
 			$r .= \html_writer::tag('li', $a);
 		}
 		return $r;
@@ -301,6 +340,4 @@ class DisplayManager
 			return $string.$cutter;
 		}
 	}
-
-
 }

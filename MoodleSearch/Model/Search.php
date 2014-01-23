@@ -29,7 +29,7 @@ class Search
 {
 	private $q = false;
 	private $results = null;
-	private $courseID = false;	
+	private $courseID = false;
 	private $tables = false;
 	private $info = array();
 
@@ -44,7 +44,7 @@ class Search
 	{
 		if ($this->results ===  null) {
 			throw new \Exception('Trying to get results before the search has been run.');
-		}	
+		}
 		return $this->results;
 	}
 
@@ -103,7 +103,7 @@ class Search
 						}
 						
 					}
-					break;	
+					break;
 			}
 		}
 		
@@ -142,8 +142,8 @@ class Search
 				if ($results['generated'] > (time() - (int)$cache_for)) {
 					$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 					$results['cached'] = true;
-					return $results;		
-				}		
+					return $results;
+				}
 			}
 			
 		}
@@ -178,7 +178,7 @@ class Search
 			if ($this->courseID) {
 				$where = "({$where})";
 				$where .= ' AND course = ?';
-				$values[] = $this->courseID; 
+				$values[] = $this->courseID;
 			}
 		
 			//Full query
@@ -238,16 +238,26 @@ class Search
 				
 					//Remove unenroled courses
 					case 'course':
-						$this->removeResultIfUserNotEnroledInCourse($result->getRow()->id, $i, $tableResults, $removeHiddenResults);
+						$this->removeResultIfUserNotEnroledInCourse(
+							$result->getRow()->id,
+							$i,
+							$tableResults,
+							$removeHiddenResults
+						);
 						break;
 						
 					//Remove resources from unenroled courses
 					default:
-						if (!$this->removeResultIfUserNotEnroledInCourse($result->getRow()->course, $i, $tableResults, $removeHiddenResults)) {
+						if (!$this->removeResultIfUserNotEnroledInCourse(
+							$result->getRow()->course,
+							$i,
+							$tableResults,
+							$removeHiddenResults
+						)) {
 							$this->removeResourceIfHidden($result, $i, $tableResults, $removeHiddenResults);
 						}
 						break;
-				}			
+				}
 			
 			}
 		}
@@ -271,7 +281,7 @@ class Search
 			//Hidden results are included, but we want them to go to the bottom
 			//Sort each table's results by 'hidden'
 			foreach ($this->results['tables'] as $tableName => &$tableResults) {
-				usort($tableResults, function($a, $b) {
+				usort($tableResults, function ($a, $b) {
 					return $a->hidden - $b->hidden;
 				});
 			}
@@ -331,12 +341,11 @@ class Search
 		//echo '<br/>';
 		if ($visible) {
 			//They can see it. Yay
-		} else if ($remove) {
+		} elseif ($remove) {
 			unset($tableResults[$i]);
 		} else {
 			$tableResults[$i]->hiddenReason = 'notvisible';
 			$tableResults[$i]->hidden = true;
 		}
 	}
-	
 }

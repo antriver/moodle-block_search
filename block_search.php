@@ -47,7 +47,13 @@ class block_search extends block_base
 		$searchBlock = new \MoodleSearch\Block();
 		
 		$this->content = new stdClass;
-		$this->content->text = $searchBlock->display->showSearchBox($_GET['q'], $this->page->course->id, false, false, get_string('search_input_text_block', 'block_search'));
+		$this->content->text = $searchBlock->display->showSearchBox(
+			$_GET['q'],
+			$this->page->course->id,
+			false,
+			false,
+			get_string('search_input_text_block', 'block_search')
+		);
 		
 		return $this->content;
 	}
@@ -85,5 +91,4 @@ class block_search extends block_base
 		// do something
 		return true;
 	}*/
-	
 }

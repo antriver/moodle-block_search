@@ -88,7 +88,7 @@ class Result
 					//Get the names of parent categories
 					return $this->getCategoryPath($this->row->id, $this->row->path, true);
 				}
-				break;	
+				break;
 		
 			//Courses
 			case 'course':
@@ -131,9 +131,15 @@ class Result
 		}
 		
 		$categoryIDs = explode('/', $pathString);
-		array_shift($categoryIDs); //Remove the first item (will be empty because the path string starts with /)
+		
+		//Remove the first item
+		//(will be empty because the path string starts with /)
+		array_shift($categoryIDs);
+		
 		if ($removeLastCategory) {
-			array_pop($categoryIDs); //Remove the last item (would cause the name to be duplicated if shown for a category result)
+			//Remove the last item
+			//(would cause the name to be duplicated if shown for a category result)
+			array_pop($categoryIDs);
 		}
 		
 		if (count($categoryIDs) < 1) {

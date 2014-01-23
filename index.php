@@ -66,13 +66,17 @@ if (!empty($q)) {
 	//Do the search
 	$search = new MoodleSearch\Search($q, $courseID);
 	$search->filterResults($removeHiddenResults);
-	$results = $search->getResults();	
+	$results = $search->getResults();
 	
 	if (count($results['tables']) < 1) {
 	
 		//There were no results
 		$icon = html_writer::tag('i', '', array('class' => 'icon-info-sign'));
-		echo html_writer::tag('div', $icon . ' ' . get_string('no_results', 'block_search'), array('class' => 'noResults'));
+		echo html_writer::tag(
+			'div',
+			$icon . ' ' . get_string('no_results', 'block_search'),
+			array('class' => 'noResults')
+		);
 	
 	} else {
 
@@ -83,7 +87,8 @@ if (!empty($q)) {
 		echo html_writer::start_tag('div', array('class' => 'col left'));
 			echo $searchBlock->display->showResultsNav($results);
 			
-			//This is here so the leftcol still has content (and doesn't collapse) when the resultsNav becomes position:fixed when scrolling
+			//This is here so the leftcol still has content (and doesn't collapse)
+			//when the resultsNav becomes position:fixed when scrolling
 			echo '&nbsp;';
 			
 		echo html_writer::end_tag('div');
@@ -100,13 +105,15 @@ echo html_writer::tag('div', '', array('class' => 'clear'));
 //Show some info about the search
 if (!empty($results)) {
 	echo '<div class="searchInfo">';
-		echo get_string('search_took', 'block_search', $results['searchTime']);
-		if (!empty($results['cached'])) {
-			echo '<br/>' . get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
-		}
-		if (!empty($results['filterTime'])) {
-			echo '<br/>' . get_string('filtering_took', 'block_search', $results['filterTime']);
-		}
+	echo get_string('search_took', 'block_search', $results['searchTime']);
+	if (!empty($results['cached'])) {
+		echo '<br/>';
+		echo get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
+	}
+	if (!empty($results['filterTime'])) {
+		echo '<br/>';
+		echo get_string('filtering_took', 'block_search', $results['filterTime']);
+	}
 	echo '</div>';
 }
 

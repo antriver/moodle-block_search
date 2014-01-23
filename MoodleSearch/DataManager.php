@@ -27,24 +27,32 @@ namespace MoodleSearch;
 
 class DataManager
 {
-	private static $cache;	
+	private static $cache;
 	
-	//Returns the unique instance ID for a resource across all of moodle, given an ID which is unique only to that module
+	//Returns the unique instance ID for a resource across all of moodle
+	//given an ID which is unique only to that module
 	public static function getGlobalInstanceIDFromModuleInstanceID($moduleName, $moduleInstanceID)
 	{
-		return self::get_field('course_modules', 'id', array('module' => self::getModuleID($moduleName), 'instance' => $moduleInstanceID));
+		return self::getDBField(
+			'course_modules',
+			'id',
+			array(
+				'module' => self::getModuleID($moduleName),
+				'instance' => $moduleInstanceID
+			)
+		);
 	}
 	
 	//Returns the ID for an installed module (plugin), given the name of the module
 	public static function getModuleID($moduleName)
 	{
-		return self::get_field('modules', 'id', array('name' => $moduleName));
+		return self::getDBField('modules', 'id', array('name' => $moduleName));
 	}
 	
 	//Get a course record
 	public static function getCourse($courseID)
 	{
-		return self::get_record('course', array('id' => $courseID));
+		return self::getDBRecord('course', array('id' => $courseID));
 	}
 	
 	//Returns the fullname for a course
@@ -57,7 +65,7 @@ class DataManager
 	//Returns the row for a section in a course
 	public static function getSection($sectionID)
 	{
-		return self::get_record('course_sections', array('id' => $sectionID));
+		return self::getDBRecord('course_sections', array('id' => $sectionID));
 	}
 	
 	//Returns information about a section a resource is in
@@ -67,7 +75,14 @@ class DataManager
 		$moduleID = self::getModuleID($moduleName);
 				
 		//Get the sectionID the resource is in
-		$sectionID = self::get_field('course_modules', 'section', array('module' => $moduleID, 'instance' => $instanceID));
+		$sectionID = self::getDBField(
+			'course_modules',
+			'section',
+			array(
+				'module' => $moduleID,
+				'instance' => $instanceID
+			)
+		);
 						
 		return self::getSection($sectionID);
 	}
@@ -120,9 +135,10 @@ class DataManager
 			case 'forum':
 				$capability = 'mod/forum:viewdiscussion';
 				break;
-			
+					
 			/*case 'lesson':
-				$capability = 'mod/lesson:manage'; //view.php only checks for :manage. Maybe there's no view capability for this plugin?
+				//The view.php only checks for :manage. Maybe there's no view capability for this plugin?
+				$capability = 'mod/lesson:manage'; 
 				break;*/
 				
 			/*case 'survey': //questionnaire the same plugin?
@@ -157,7 +173,7 @@ class DataManager
 	
 
 	//Gets a single field from a table in the database (cached)
-	private static function get_field($tableName, $fieldName, $where)
+	private static function getDBField($tableName, $fieldName, $where)
 	{
 		$hash = md5("field{$tableName}{$fieldName}".http_build_query($where));
 		
@@ -174,7 +190,7 @@ class DataManager
 	}
 	
 	//Gets a single row from a table in the database (cached)
-	private static function get_record($tableName, $where)
+	private static function getDBRecord($tableName, $where)
 	{
 		$hash = md5("record{$tableName}".http_build_query($where));
 		
@@ -203,18 +219,69 @@ class DataManager
 		return self::$cache;
 	}
 	
+	public static function getTablesPossibleToSearch()
+	{
+		global $DB;
+		
+		$tables = array();
+		
+		//Courses table
+		$tables['course'] = 'course (fullname, shortname)';
+		
+		//Database manager object
+		$dbman = $DB->get_manager();
+		
+		//Get all modules (plugins) - we're going to search their tables
+		$modules = $DB->get_records('modules', array(), 'name');
+		
+		foreach ($modules as $module) {
+		
+			$tableName = $module->name;
+			$tableFields = array();
+			
+			//Create an xmldb object from the name of this table
+			$table = new \xmldb_table($tableName);
+		
+			//Skip this module if it has no table
+			//(Only checks if a table with the same name as the module exists)
+			if (!$dbman->table_exists($table)) {
+				continue;
+			}
+			
+			//We want to check if these fields exist in the table
+			$possibleFields = array('name', 'intro');
+		
+			//Check if each of these fields (columns) exists in the table
+			foreach ($possibleFields as $fieldName) {
+	
+				//Create an xmldb object for this field's name
+				$field = new \xmldb_field($fieldName);
+				
+				//If this field exists in the table, we're going to search in it
+				if ($dbman->field_exists($table, $field)) {
+					$tableFields[] = $fieldName;
+				}
+				
+			}
+
+			$tables[$tableName] = $tableName . ' (' .implode(', ', $tableFields) . ')';
+				
+		} //end foreach module
+		
+		return $tables;
+	}
+	
 	//Returns the current time in microseconds.
 	//Used for timing how long things take
-	public static function getDebugTime() 
-	{ 
-		$timer = explode( ' ', microtime()); 
-		$timer = $timer[1] + $timer[0]; 
-		return $timer; 
+	public static function getDebugTime()
+	{
+		$timer = explode(' ', microtime());
+		$timer = $timer[1] + $timer[0];
+		return $timer;
 	}
 	
 	public static function debugTimeTaken($startTime)
 	{
 		return round((self::getDebugTime() - $startTime), 4);
 	}
-
 }

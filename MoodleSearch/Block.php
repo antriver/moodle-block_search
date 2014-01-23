@@ -49,5 +49,5 @@ class Block
 	{
 		global $CFG;
 		return $CFG->wwwroot . $this->path;
-	}	
+	}
 }
