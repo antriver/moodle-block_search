@@ -21,16 +21,17 @@
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['descconfig'] = 'Description of the config section';
-
-$string['descfoo'] = 'Config description';
-
-$string['headerconfig'] = 'Config section header';
-$string['labelfoo'] = 'Config label';
-
 $string['pluginname'] = 'Search';
 $string['pagetitle'] = 'Search';
 
+$string['selectall'] = 'Select All';
+
+$string['settings_search_tables_name'] = 'Search Tables';
+$string['settings_search_tables_desc'] = 'Which tables in the database will be searched.';
+
+$string['settings_cache_results_name'] = 'Cache Results For';
+$string['settings_cache_results_desc'] = 'How long (in settings) to cache search results for. 0 mean no caching. Default is 1 day.';
+
 //Capabilities
 $string['search:search'] = 'Perform a search';
-$string['search:managesettings'] = 'Modify search settings';
+#$string['search:managesettings'] = 'Modify search settings';

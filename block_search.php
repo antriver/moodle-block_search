@@ -104,4 +104,5 @@ class block_search extends block_base
 		// do something
 		return true;
 	}*/
+	
 }

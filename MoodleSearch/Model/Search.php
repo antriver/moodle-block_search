@@ -54,50 +54,61 @@ class Search
 	{
 		global $DB;
 		
-		if (!$this->courseID) {
-			//Courses and categories
-			$tables = array(
-				//'course_categories' => array('name'),
-				'course' => array('fullname', 'shortname'),
-			);
-		}
-
+		//Load the config setting for tables to search
+		//(A comma seperated list of table names without the prefix)
+		$tablesToSearch = get_config('block_search', 'search_tables');
+		$tablesToSearch = explode(',', $tablesToSearch);
+		
+		//This array will hold the tables => array('fields') we'll actually search
+		$fieldsToSearch = array();
+		
 		//Database manager object
 		$dbman = $DB->get_manager();
 		
-		//Get all modules (activities) - we're going to search their tables
-		$modules = $DB->get_records('modules', array(), 'name');
+		//Go through each table the admin wants to be searched and set which fields from that table to search
+		//(Makes sure the tables and fields exist)
+		foreach ($tablesToSearch as $tableName) {
 		
-		foreach ($modules as $module) {
-		
-			//Create an xmldb object from the name of this table
-			$table = new \xmldb_table($module->name);
-		
-			//Skip this module if it has no table
-			//(Only checks if a table with the same name as the module exists)
-			if (!$dbman->table_exists($table)) {
-				continue;
+			switch ($tableName) {
+			
+				case 'course':
+					//Don't show other courses if we're searching in a course
+					if ($this->courseID) {
+						continue;
+					}
+					$fieldsToSearch['course'] = array('fullname', 'shortname');
+					break;
+					
+				default:
+					//Create an xmldb object from the name of this table
+					$table = new \xmldb_table($tableName);
+				
+					//Skip this module if it has no table
+					//(Only checks if a table with the same name as the module exists)
+					if (!$dbman->table_exists($table)) {
+						continue;
+					}
+				
+					//We want to check if these fields exist in the table
+					$moduleFields = array('name', 'intro');
+				
+					//Check if each of these fields (columns) exists in the table
+					foreach ($moduleFields as $fieldName) {
+			
+						//Create an xmldb object for this field's name
+						$field = new \xmldb_field($fieldName);
+						
+						//If this field exists in the table, we're going to search in it
+						if ($dbman->field_exists($table, $field)) {
+							$fieldsToSearch[$tableName][] = $fieldName;
+						}
+						
+					}
+					break;	
 			}
+		}
 		
-			//We want to check if these fields exist in the table
-			$moduleFields = array('name', 'intro');
-		
-			//Check if each of these fields (columns) exists in the table
-			foreach ($moduleFields as $fieldName) {
-	
-				//Create an xmldb object for this field's name
-				$field = new \xmldb_field($fieldName);
-				
-				//If this field exists in the table, we're going to search in it
-				if ($dbman->field_exists($table, $field)) {
-					$tables[$module->name][] = $fieldName;
-				}
-				
-			}
-				
-		} //end foreach module
-		
-		return $tables;
+		return $fieldsToSearch;
 	}
 	
 	//Search for rows which match the search query
@@ -114,19 +125,26 @@ class Search
 		
 		$startTime = DataManager::getDebugTime();
 		
-		$hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
+		$cache_for = get_config('block_search', 'cache_results');
+		$cache = $cache_for > 0 ? true : false;
 		
-		//Check if cached results exists
-		$results = DataManager::getCache()->get($hash);
+		if ($cache) {
 		
-		if (is_array($results)) {
+			$hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
 		
-			//If the cached results are less than 1 day old (86400 seconds) we'll use them
-			if ($results['generated'] && $results['generated'] > (time() - 86400)) {
-				$results['searchTime'] = DataManager::debugTimeTaken($startTime);
-				$results['cached'] = true;
-				return $results;		
-			}		
+			//Check if cached results exists
+			$results = DataManager::getCache()->get($hash);
+		
+			if (is_array($results)) {
+		
+				//If the cached results are newer than than the cache_results setting we'll use them
+				if ($results['generated'] > (time() - (int)$cache_for)) {
+					$results['searchTime'] = DataManager::debugTimeTaken($startTime);
+					$results['cached'] = true;
+					return $results;		
+				}		
+			}
+			
 		}
 
 		global $DB;
@@ -185,7 +203,9 @@ class Search
 			}
 		}
 		
-		DataManager::getCache()->set($hash, $results);
+		if ($cache) {
+			DataManager::getCache()->set($hash, $results);
+		}
 		
 		$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 		
