@@ -32,14 +32,7 @@ $settings->add(
 		'block_search/search_tables',
 		get_string('settings_search_tables_name', 'block_search'),
 		get_string('settings_search_tables_desc', 'block_search') .
-		html_writer::tag(
-			'a',
-			get_string('selectall', 'block_search'),
-			array(
-				'href' => '#',
-				'onclick' => "Y.all('#admin-search_tables input[type=checkbox]\').set(\'checked\', true); return false"
-			)
-		),
+		' <a href="#" onclick="Y.all(\'#admin-search_tables input[type=checkbox]\').set(\'checked\', true); return false;">' . get_string('selectall', 'block_search') . '</a>',
 		implode(',', array_keys($possibleTables)),
 		$possibleTables
 	)
