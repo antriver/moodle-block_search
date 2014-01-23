@@ -98,7 +98,8 @@ class Search
 		$hash = md5('search'.$this->q.'courseid'.$this->courseID);
 		
 		//Check if cached results exists
-		if ($results = DataManager::getCache()->get($hash)) {
+		$results = DataManager::getCache()->get($hash);
+		if (is_array($results)) {
 			$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 			$results['cached'] = true;
 			return $results;
@@ -140,11 +141,14 @@ class Search
 			$sql = 'SELECT * FROM {' . $table . '} WHERE ' . $where;
 			
 			//Run the query and return the matched rows
-			$results['tables'][$table] = $DB->get_records_sql($sql, $values);
+			if ($tableResults = $DB->get_records_sql($sql, $values)) {
+				$results['tables'][$table] = $tableResults;
+			}
 		}
 		
 		if (count($results['tables']) < 1) {
 			DataManager::getCache()->set($hash, $results);
+			$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 			return $results;
 		}
 		

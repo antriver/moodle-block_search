@@ -57,33 +57,33 @@ class DataManager
 	
 	public static function canUserSeeModule($courseID, $module, $idInModule)
 	{
+		//Current logged in user
 		global $USER;
 		
+		//Get the overall coursemodule ID, from the module's ID inside the plugin
 		$cmid = self::getGlobalInstanceIDFromModuleInstanceID($module, $idInModule);
 		
-		global $time_spent_getting_modinfo;
-		
-		#$start = DataManager::getDebugTime();
-		
-		// Construct info for this module
-		#$cm = new cm_info($this, $courseID, $mod, $info);
-		
-		//$course = DataManager::getCourse($courseID);
-		
+		//Load the "modinfo" for the course, and see if the module is "uservisible"
+		//This is pretty expensive and is likely the source of any slowness,
+		//because get_fast_modinfo loads info for all the modules in the course
+		//even though we only want the one
 		$modinfo = get_fast_modinfo($courseID, $USER->id);
-		$mod = $modinfo->get_cm($cmid);
 		
-		#$time_taken = DataManager::getDebugTime() - $start;
-		#$time_spent_getting_modinfo[] = $time_taken;
-		
-		#echo '<p>'. round($time_taken, 4) . ' seconds</p>';
+		try {
+			$mod = $modinfo->get_cm($cmid);
+			//Throws a moodle_exception if it's not found
+		} catch (\moodle_exception $e) {
+			return false;
+		}
 		
 		//If the module says it's not visible, don't show it
 		if (!$mod->uservisible) {
 			return false;
 		}
 		
-		//It still might not be right to show it, so let's handle each plugin and check if the user has whatever capability applies to it
+		//It still might not be right to show it, because some plugins still want to be shown
+		//but the user will just see "you don't have permission" when they click it
+		//So let's handle each plugin that's awkward and check if the user has whatever capability applies to it
 		switch ($module) {
 		
 			case 'chat':
@@ -102,17 +102,13 @@ class DataManager
 				$capability = 'mod/forum:viewdiscussion';
 				break;
 			
-			/*case 'glossary':
-				$capability = 'mod/glossary:view'; //:view should already have been handled
-				break;*/
-				
 			/*case 'lesson':
 				$capability = 'mod/lesson:manage'; //view.php only checks for :manage. Maybe there's no view capability for this plugin?
 				break;*/
 				
-			case 'survey': //questionnaire the same plugin?
+			/*case 'survey': //questionnaire the same plugin?
 				$capability = 'mod/questionnaire:view';
-				break;
+				break;*/
 				
 			case 'wiki':
 				$capability = 'mod/wiki:viewpage';
@@ -127,14 +123,16 @@ class DataManager
 				break;
 		}
 		
+		//If this plugin has a capability we can check
 		if (!empty($capability)) {
+			//Check if the user has the capability within the module context
 			$moduleContext = \context_module::instance($cmid);
-		
 			if (!has_capability($capability, $moduleContext, $USER->id)) {
 				return false;
 			}
 		}
 		
+		//Now they can see it
 		return true;
 	}
 	
