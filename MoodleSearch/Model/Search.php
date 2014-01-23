@@ -95,21 +95,26 @@ class Search
 		
 		$startTime = DataManager::getDebugTime();
 		
-		$hash = md5('search'.$this->q.'courseid'.$this->courseID);
+		$hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
 		
 		//Check if cached results exists
 		$results = DataManager::getCache()->get($hash);
+		
 		if (is_array($results)) {
-			$results['searchTime'] = DataManager::debugTimeTaken($startTime);
-			$results['cached'] = true;
-			return $results;
+		
+			//If the cached results are less than 1 day old (86400 seconds) we'll use them
+			if ($results['generated'] && $results['generated'] > (time() - 86400)) {
+				$results['searchTime'] = DataManager::debugTimeTaken($startTime);
+				$results['cached'] = true;
+				return $results;		
+			}		
 		}
 
 		global $DB;
 		
 		$results = array(
 			'tables' => array(),
-			'generated' => date('Y-m-d H:i:s'),
+			'generated' => time(),
 			'searchTime' => 0,
 			'cached' => false,
 		);
@@ -176,6 +181,11 @@ class Search
 	function filterResults($removeHiddenResults = true)
 	{
 		global $USER;
+		
+		//Site admin can see everything so don't bother filtering
+		if (is_siteadmin()) {
+			return;
+		}
 		
 		$startTime = DataManager::getDebugTime();
 		

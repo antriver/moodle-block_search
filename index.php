@@ -2,6 +2,8 @@
 
 require_once '../../config.php';
 
+require_login();
+
 require_once __DIR__ . '/MoodleSearch/Block.php';
 $searchBlock = new MoodleSearch\Block();
 
@@ -68,7 +70,6 @@ if (!empty($q)) {
 		echo html_writer::start_tag('div', array('id' => 'results', 'class' => 'col right'));
 			echo $searchBlock->display->showResults($results['tables']);
 		echo html_writer::end_tag('div');
-		
 	}
 			
 }
@@ -78,19 +79,19 @@ echo html_writer::tag('div', '', array('class' => 'clear'));
 //Show some info about the search
 if (!empty($results)) {
 	echo '<div class="searchInfo">Search took <strong>' . $results['searchTime'] . '</strong> seconds.';
-	if ($results['cached']) {
-		echo '<br/>Cached results generated <strong>' . $results['generated'] . '</strong>';
+	if (!empty($results['cached'])) {
+		echo '<br/>Cached results generated <strong>' . date('Y-m-d H:i:s', $results['generated']) . '</strong>';
 	}
-	echo '<br/>Filtering results took <strong>' . $results['filterTime'] .'</strong> seconds.';
+	if (!empty($results['filterTime'])) {
+		echo '<br/>Filtering results took <strong>' . $results['filterTime'] .'</strong> seconds.';
+	}
 	echo '</div>';
 }
 
 echo html_writer::end_tag('div');
 
-
-echo '<script src="' . $searchBlock->getFullURL() . 'assets/42/jquery.scrollTo.min.js"></script>';
+echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.scrollTo.min.js"></script>';
 echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.localScroll.min.js"></script>';
 echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/block_search.js"></script>';
-echo "<script> $(function(){ $.localScroll({duration: 200, hash: true, offset: -35 }); }); </script>";
 
 echo $OUTPUT->footer();
