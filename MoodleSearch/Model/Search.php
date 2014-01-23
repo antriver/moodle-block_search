@@ -1,9 +1,28 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
-* Class for performing a search in all courses, categories an modules
-*/
-
+ * Object to represent an entire search action.
+ * Creating a new search runs the search. Use getResults to get the results.
+ * Will return an array of MoodleSearch\Result objects.
+ * @package	   block_search
+ * @copyright	 Anthony Kuske <www.anthonykuske.com>
+ * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+ 
 namespace MoodleSearch;
 
 class Search
@@ -83,7 +102,7 @@ class Search
 	
 	//Search for rows which match the search query
 	//Returns an associative array of the tables that were searched
-	public function runSearch()
+	private function runSearch()
 	{
 		if (empty($this->q)) {
 			throw new \Exception('No query was given.');
@@ -178,7 +197,7 @@ class Search
 	/**
 	* Go through the array of results and remove those the user doesn't have permission to see
 	*/
-	function filterResults($removeHiddenResults = true)
+	public function filterResults($removeHiddenResults = true)
 	{
 		global $USER;
 		

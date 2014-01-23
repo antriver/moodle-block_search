@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Search functions
+ * Search block functions
  * @package	   block_search
  * @copyright	 Anthony Kuske <www.anthonykuske.com>
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
