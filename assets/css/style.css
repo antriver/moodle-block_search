@@ -88,7 +88,7 @@
 		margin:0;
 		padding:0;
 	}
-	
+
 		/* Make fontawesome icons have the same width as img icons */
 		#block_search #resultsNav li i {
 			padding-right: 8px;
@@ -143,55 +143,81 @@
 		background:#f5f5f5;
 	}
 
-#block_search ul.results > li:last-child {
-	margin-bottom:0;
-}
-
-#block_search a.resultLink {
-	font-size:16px;
-	font-weight:bold;
-}
-
-	#block_search #results a.resultLink img.icon {
-		padding-right:5px;
+	#block_search ul.results > li:last-child {
+		margin-bottom:0;
 	}
-
-	#block_search a.resultLink i {
-		padding-right:5px;
+	
+	#block_search a.resultLink {
+		font-size:16px;
+		font-weight:bold;
 	}
-
-#block_search ul.results li p {
-	padding:5px;
-	font-size:13px;
-}
-
-#block_search ul.path {
-	font-size:11px;
-	margin:0 0 5px 0;
-	list-style:none;
-	font-weight:normal;
-}
-	#block_search ul.path li {
-		opacity:.9;
-		display: inline;
-	}
-		#block_search ul.path li a {
-			color:#333;
+	
+		#block_search #results a.resultLink img.icon {
+			padding-right:5px;
 		}
-		#block_search ul.path li i {
-			color:#666;
+	
+		#block_search a.resultLink i {
+			padding-right:5px;
 		}
-		#block_search ul.path li:hover {
-			opacity:1;
+	
+	#block_search ul.results li p {
+		padding:5px;
+		font-size:13px;
+	}
+	
+	/* Hidden results (user doesn't have access) */
+	#block_search #results li.hidden {
+		opacity:.8;
+	}
+		#block_search #results li.hidden a {
+			color:#AAA;
 		}
 		
-		#block_search ul.path li:after {
-			content:">";
-			padding:0 6px;
-			color:#999;
+		/* Make icons in hidden results greyscale */
+		#block_search #results li.hidden img {
+			filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
+		    filter: gray; /* IE6-9 */
+		    -webkit-filter: grayscale(100%); /* Chrome 19+, Safari 6+, Safari 6+ iOS */
 		}
-			#block_search ul.path li:last-child:after {
-				content:"";
+		
+		#block_search #results li.hidden p {
+			color:#AAA;
+		}
+	
+	#block_search #results li h5.hiddenReason {
+		color:#AAA;
+		font-size:12px;
+		margin:5px 0;
+	}
+	
+	/* Path to search results */
+	#block_search ul.path {
+		font-size:11px;
+		margin:0 0 5px 0;
+		list-style:none;
+		font-weight:normal;
+	}
+		#block_search ul.path li {
+			opacity:.9;
+			display: inline;
+		}
+			#block_search ul.path li a {
+				color:#333;
+			}
+			#block_search ul.path li i {
+				color:#666;
+			}
+			#block_search ul.path li:hover {
+				opacity:1;
 			}
 			
+			#block_search ul.path li:after {
+				content:">";
+				padding:0 6px;
+				color:#999;
+			}
+				#block_search ul.path li:last-child:after {
+					content:"";
+				}
+				
 					

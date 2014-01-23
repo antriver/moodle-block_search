@@ -4,12 +4,14 @@
 * A model for a search result
 */
 
-namespace MoodleSearch\Model;
+namespace MoodleSearch;
 
 class Result
 {
-	private $tableName;
 	private $row;
+	public $tableName;
+	public $hidden = false;
+	public $hiddenReason = '';
 
 	public function __construct($tableName, $row)
 	{
@@ -18,7 +20,7 @@ class Result
 	}
 
 	//Gives a human readable name for a result row
-	public function name()	
+	public function name()
 	{
 		if ($this->tableName == 'course') {
 			return $this->row->fullname;
@@ -29,6 +31,10 @@ class Result
 	
 	public function description()
 	{
+		if (empty($this->row->intro)) {
+			return false;
+		}
+		
 		$d = $this->row->intro;
 		$d = str_replace('<p></p>', '', $d);
 		return trim($d);
@@ -44,7 +50,7 @@ class Result
 				return '/course/view.php?id=' . $this->row->id;
 				
 			default:
-				$resourceID = \MoodleSearch\Data::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
+				$resourceID = DataManager::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
 				return '/mod/' . $this->tableName . '/view.php?id=' . $resourceID;
 		}
 	}
@@ -76,10 +82,10 @@ class Result
 			default:
 			
 				//Get all info for the course this resource is in
-				$course = \MoodleSearch\Data::getCourse($this->row->course);
+				$course = DataManager::getCourse($this->row->course);
 				
 				//Get all info for the course section this resource is in
-				$section = \MoodleSearch\Data::getResourceSection($this->tableName, $this->row->id);
+				$section = DataManager::getResourceSection($this->tableName, $this->row->id);
 				
 				$path = $this->getCategoryPath($course->category);
 				$courseIcon = course_get_icon($course->id);
@@ -129,5 +135,10 @@ class Result
 		}
 		
 		return $path;
+	}
+	
+	public function getRow()
+	{
+		return $this->row;
 	}
 }
