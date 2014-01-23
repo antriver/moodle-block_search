@@ -28,18 +28,24 @@ $capabilities = array(
 	//Ability for users to search
 	'block/search:search' => array(
 		'captype' => 'read',
-		'contextlevel' => CONTEXT_SYSTEM
-        'clonepermissionsfrom' => 'moodle/site:manageblocks'
+		'contextlevel' => CONTEXT_SYSTEM,
+        'clonepermissionsfrom' => 'moodle/block:view', //copy permissions from this capability
+       	'archetypes' => array(
+			'user' => CAP_ALLOW,
+			'student'        => CAP_ALLOW,
+            'teacher'        => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager'          => CAP_ALLOW,
+		),
     ),
 
 	//Ability to edit search settings (admin)
-    'block/search:managesettings' => array(
-	'captype' => 'write',
-	'contextlevel' => CONTEXT_SYSTEM,
-	'archetypes' => array(
-		'user' => CAP_ALLOW
-	),
-	'clonepermissionsfrom' => 'moodle/my:manageblocks'
-),
+    /*'block/search:managesettings' => array(
+		'captype' => 'write',
+		'contextlevel' => CONTEXT_SYSTEM,
+		'archetypes' => array(
+			'manager' => CAP_ALLOW
+		),
+	),*/
 
 );

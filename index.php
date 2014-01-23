@@ -4,6 +4,8 @@ require_once '../../config.php';
 
 require_login();
 
+require_capability('block/search:search', context_system::instance());
+
 require_once __DIR__ . '/MoodleSearch/Block.php';
 $searchBlock = new MoodleSearch\Block();
 

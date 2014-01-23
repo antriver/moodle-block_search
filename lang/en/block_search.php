@@ -21,12 +21,16 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['blockstring'] = 'Block string';
 $string['descconfig'] = 'Description of the config section';
+
 $string['descfoo'] = 'Config description';
+
 $string['headerconfig'] = 'Config section header';
 $string['labelfoo'] = 'Config label';
-$string['search:addinstance'] = 'Add a search block';
-$string['search:myaddinstance'] = 'Add a search block to my moodle';
+
 $string['pluginname'] = 'Search';
 $string['pagetitle'] = 'Search';
+
+//Capabilities
+$string['search:search'] = 'Perform a search';
+$string['search:managesettings'] = 'Modify search settings';

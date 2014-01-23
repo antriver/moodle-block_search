@@ -8,7 +8,7 @@
 //
 // Moodle is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
 // GNU General Public License for more details.
 //
 // You should have received a copy of the GNU General Public License
@@ -16,9 +16,9 @@
 
 /**
  * Search functions
- * @package    block_search
- * @copyright    Anthony Kuske <www.anthonykuske.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package	   block_search
+ * @copyright	 Anthony Kuske <www.anthonykuske.com>
+ * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -85,20 +85,23 @@ class block_search extends block_base
 		);
 	}
 
+
+	//Can multiple instance of this block be added to the same page?
 	public function instance_allow_multiple()
 	{
-		return true;
+		return false;
 	}
 
+	//Do we have a settings.php file? (Global admin settings for the block)
 	public function has_config()
 	{
 		return true;
 	}
 
-	public function cron()
+	/*public function cron()
 	{
 		mtrace("Hey, my cron script is running");
 		// do something
 		return true;
-	}
+	}*/
 }
