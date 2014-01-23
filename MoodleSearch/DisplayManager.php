@@ -51,7 +51,7 @@ class DisplayManager
 			)
 		);
 		
-		if ($paceholderText === null) {
+		if ($placeholderText === null) {
 			$placeholderText = get_string('search_input_text_page', 'block_search');
 		}
 		
