@@ -24,6 +24,7 @@
 //General blockyness
 $string['pluginname'] = 'Search';
 $string['pagetitle'] = 'Search';
+$string['search'] = 'Search';
 
 //Placeholder text for the search box when shown in a block on a page
 $string['search_input_text_block'] = 'Search this course';
@@ -31,7 +32,24 @@ $string['search_input_text_block'] = 'Search this course';
 //Placeholder text for the search box when shown on the full search page
 $string['search_input_text_page'] = 'Find courses, activities, or documents';
 
+//Search form
+$string['search_options'] = 'Search Options:';
+$string['search_all_of_site'] = 'Search all of {$a}';
+$string['search_in_course'] = 'Search in {$a}';
 $string['include_hidden_results'] = 'Include results I don\'t have access to';
+
+//Search results
+$string['search_results_for'] = 'Search Results for \'{$a}\'';
+$string['search_results'] = 'Search Results';
+$string['items_found'] = '{$a} Items Found';
+$string['no_results'] = 'Sorry, there were no results for your search.';
+$string['hidden_not_enrolled'] = 'You are not enrolled in this course.';
+$string['hidden_not_available'] = 'This resource has not been made available to you.';
+
+//Search stats
+$string['search_took'] = 'Search took <strong>{$a}</strong> seconds.';
+$string['cached_results_generated'] = 'Cached results from <strong>{$a}</strong>.';
+$string['filtering_took'] = 'Filtering results took <strong>{$a}</strong> seconds.';
 
 //Admin settings
 $string['settings_search_tables_name'] = 'Search Tables';

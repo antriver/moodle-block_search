@@ -155,6 +155,7 @@ class Search
 			'generated' => time(),
 			'searchTime' => 0,
 			'cached' => false,
+			'total' => 0
 		);
 		$q = strtolower($this->q);
 		$q = "%{$q}%";
@@ -201,6 +202,7 @@ class Search
 		foreach ($results['tables'] as $tableName => &$tableResults) {
 			foreach ($tableResults as &$row) {
 				$row = new Result($tableName, $row);
+				++$results['total'];
 			}
 		}
 		
@@ -252,10 +254,15 @@ class Search
 		
 		if ($removeHiddenResults) {
 		
+			$this->results['total'] = 0;
+		
 			//Now remove tables that have no results left
 			foreach ($this->results['tables'] as $tableName => $tableResults) {
-				if (count($tableResults) < 1) {
+				$c = count($tableResults);
+				if ($c < 1) {
 					unset($this->results['tables'][$tableName]);
+				} else {
+					$this->results['total'] += $c;
 				}
 			}
 			

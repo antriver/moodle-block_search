@@ -61,13 +61,13 @@ class DisplayManager
 			//Search Button
 			$r .= \html_writer::tag(
 				'button',
-				\html_writer::tag('i', '', array('class' => 'icon-search')) . ' Search',
+				\html_writer::tag('i', '', array('class' => 'icon-search')) . ' ' . get_string('search', 'block_search'),
 				array('class' => 'searchButton')
 			);
 			
 			if ($showOptions) {
 			
-				$r .= '<strong>' . \html_writer::tag('i', '', array('class' => 'icon-cogs')) . ' Search Options:</strong>';
+				$r .= '<strong>' . \html_writer::tag('i', '', array('class' => 'icon-cogs')) . ' ' . get_string('search_options', 'block_search') . '</strong>';
 				
 				//If courseID is in the URL, show options to search this course or everywhere
 				if ($courseID) {
@@ -78,7 +78,7 @@ class DisplayManager
 							'type' => 'radio',
 							'name' => 'courseID',
 							'value' => 0,
-						)) . 'Search all of '. $SITE->shortname
+						)) . get_string('search_all_of_site', 'block_search', $SITE->shortname)
 					);
 	
 					$r .= \html_writer::tag(
@@ -88,7 +88,7 @@ class DisplayManager
 							'name' => 'courseID',
 							'value' => $courseID,
 							'checked' => 'checked'
-						)) . 'Search in ' . \MoodleSearch\DataManager::getCourseName($courseID)
+						)) . get_string('search_in_course', 'block_search', \MoodleSearch\DataManager::getCourseName($courseID))
 					);				
 					
 				}
@@ -129,13 +129,13 @@ class DisplayManager
 		$r = \html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 		
 		$r .= \html_writer::start_tag('div', array('class' => 'header'));
-			$r .= \html_writer::tag('h2', 'Items Found');
+			$r .= \html_writer::tag('h2', get_string('items_found', 'block_search', number_format($results['total'])));
 		$r .= \html_writer::end_tag('div');
 		
 		$r .= \html_writer::start_tag('div', array('class' => 'content'));
 		$r .= \html_writer::start_tag('ul');
 		
-		foreach ($results as $tableName => $tableResults) {
+		foreach ($results['tables'] as $tableName => $tableResults) {
 			if (count($tableResults) < 1) {
 				continue;
 			}
@@ -196,13 +196,13 @@ class DisplayManager
 		switch ($tableName) {
 			case 'course_categories':
 				return array(
-					'title' => 'Categories',
+					'title' => get_string('categories', 'moodle'),
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-open'))
 				);
 				break;
 			case 'course':
 				return array(
-					'title' => 'Courses',
+					'title' => get_string('courses', 'moodle'),
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-archive'))
 				);
 				break;		
@@ -214,7 +214,7 @@ class DisplayManager
 					);
 				} else {
 					return array(
-						'title' =>$tableName,
+						'title' =>$tableName, //oops no localization
 						'icon' => \html_writer::tag('i', '', array('class' => 'icon-certificate'))
 					);
 				}
@@ -238,9 +238,9 @@ class DisplayManager
 			
 			if (!empty($result->hiddenReason)) {
 				if ($result->hiddenReason == 'notenrolled') {
-					$niceHiddenReason = 'You are not enroled in this course.';
+					$niceHiddenReason = get_string('hidden_not_enrolled', 'block_search');
 				} else if ($result->hiddenReason == 'notvisible') {
-					$niceHiddenReason = 'This resource hasn\'t been made available to you.';
+					$niceHiddenReason = get_string('hidden_not_available', 'block_search');
 				}
 				$r .= \html_writer::tag(
 					'h5', 
