@@ -35,6 +35,10 @@ $escapedq = htmlentities($q);
 $courseID = optional_param('courseID', 0, PARAM_INT);
 $showHiddenResults = optional_param('showHiddenResults', false, PARAM_BOOL);
 
+if (!get_config('block_search', 'allow_no_access')) {
+	$showHiddenResults = false;
+}
+
 if ($courseID) {
 	$PAGE->set_context(context_course::instance($courseID));
 } else {

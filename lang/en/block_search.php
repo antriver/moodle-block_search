@@ -59,6 +59,8 @@ $string['settings_cache_results_name'] = 'Cache Results For';
 $string['settings_cache_results_desc'] = 'How long (in seconds) to cache search results for. 0 mean no caching. Default is 1 day.';
 $string['settings_log_searches_name'] = 'Log Searches';
 $string['settings_log_searches_desc'] = 'Should searches made be logged in the Moodle logs?';
+$string['settings_allow_no_access_name'] = 'Show Hidden Results';
+$string['settings_allow_no_access_desc'] = 'Allow users to tick "'. $string['include_hidden_results'] .'" to see results that aren\'t available to them. (This does not allow them to access the actual content that is found. But the user can see that it exists.)';
 
 
 //Capabilities

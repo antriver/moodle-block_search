@@ -58,3 +58,13 @@ $settings->add(
 		1
 	)
 );
+
+//Options
+$settings->add(
+	new admin_setting_configcheckbox(
+		'block_search/allow_no_access',
+		get_string('settings_allow_no_access_name', 'block_search'),
+		get_string('settings_allow_no_access_desc', 'block_search'),
+		1
+	)
+);
