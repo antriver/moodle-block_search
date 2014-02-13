@@ -2,9 +2,9 @@ A search plugin for Moodle!
 
 About
 ==========
-Allows Moodle users to search for Courses and resources.
+Allows Moodle users to search for courses and resources.
 Searches can be site-wide or in a specific course.
-Users can search from the search page (http://yourmoodle.com/blocks/search), or you can add the search box as a Block to your course pages.
+Users can search from the search page (http://your.moodle.url/blocks/search), or you can add the search box as a Block to your course pages.
 
 Screenshot of search page.
 ![Screenshot of search page](http://img.ctrlv.in/img/52e0c33b094d7.jpg)
@@ -26,7 +26,7 @@ $ cd /path/to/moodle/blocks
 $ git clone https://github.com/antriver/moodle-block_search.git search
 ```
 Then login to your Moodle as admin and it will install.
-Visit http://your-moodle-site.com/blocks/search to perform a search.
+Visit http://your.moodle.url/blocks/search to perform a search.
 
 Settings
 ==========
@@ -36,10 +36,3 @@ Here you can choose which tables in the database to look for results in and chan
 ![Admin options 1](http://img.ctrlv.in/img/52e0c3742584a.jpg)
 
 ![Admin options 2](http://img.ctrlv.in/img/52e0c38b04a9e.jpg)
-
-Room for Improvement (for developers)
-==========
-Possible extra features:
-* Ability to pick not only the tables to search but which fields too (instead of the defaults).
-* Option to disable the "Include results I don't have access to" checkbox.
-* Performance should be okay, but the biggest drain is checking what resources the user has access to. `MoodleSearch/DataManager.php:104` loads the 'modinfo' for the course the activity in. This ends up loading the info for all the resources in that course. But as far as I can see Moodle doesn't provide (support) a way to create a 'cm_info' bject without first loading all the course modinfo.
