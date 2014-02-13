@@ -33,7 +33,7 @@ $settings->add(
 		get_string('settings_search_tables_name', 'block_search'),
 		get_string('settings_search_tables_desc', 'block_search') .
 		' <a href="#" onclick="Y.all(\'#admin-search_tables input[type=checkbox]\').set(\'checked\', true); return false;">' . get_string('selectall', 'block_search') . '</a>',
-		implode(',', array_keys($possibleTables)),
+		'',
 		$possibleTables
 	)
 );
@@ -46,5 +46,15 @@ $settings->add(
 		get_string('settings_cache_results_desc', 'block_search'),
 		86400,
 		PARAM_INT
+	)
+);
+
+//Logging
+$settings->add(
+	new admin_setting_configcheckbox(
+		'block_search/log_searches',
+		get_string('settings_log_searches_name', 'block_search'),
+		get_string('settings_log_searches_desc', 'block_search'),
+		1
 	)
 );

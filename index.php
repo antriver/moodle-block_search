@@ -47,6 +47,12 @@ $PAGE->requires->css('/blocks/search/assets/css/page.css');
 //Page title
 if (!empty($q)) {
 	$PAGE->set_title(get_string('search_results_for', 'block_search', $escapedq));
+
+	//Log the search (if logging is enabled)
+	if (get_config('block_search', 'log_searches') == 1) {
+		add_to_log($courseID, 'block_search', 'search', '/blocks/search', $q, 0, $USER->id);
+	}
+
 } else {
 	$PAGE->set_title(get_string('pagetitle', $searchBlock->blockName));
 }
@@ -58,18 +64,18 @@ echo html_writer::start_tag('div', array('id' => $searchBlock->blockName));
 
 
 echo $searchBlock->display->showSearchBox($q, $courseID, $showHiddenResults);
-	
+
 if (!empty($q)) {
 
 	$removeHiddenResults = empty($showHiddenResults) ? true : false;
-				
+
 	//Do the search
 	$search = new MoodleSearch\Search($q, $courseID);
 	$search->filterResults($removeHiddenResults);
 	$results = $search->getResults();
-	
+
 	if (count($results['tables']) < 1) {
-	
+
 		//There were no results
 		$icon = html_writer::tag('i', '', array('class' => 'icon-info-sign'));
 		echo html_writer::tag(
@@ -77,7 +83,7 @@ if (!empty($q)) {
 			$icon . ' ' . get_string('no_results', 'block_search'),
 			array('class' => 'noResults')
 		);
-	
+
 	} else {
 
 		$icon = html_writer::tag('i', '', array('class' => 'icon-list-ul'));
@@ -86,18 +92,18 @@ if (!empty($q)) {
 		//Show results
 		echo html_writer::start_tag('div', array('class' => 'col left'));
 			echo $searchBlock->display->showResultsNav($results);
-			
+
 			//This is here so the leftcol still has content (and doesn't collapse)
 			//when the resultsNav becomes position:fixed when scrolling
 			echo '&nbsp;';
-			
+
 		echo html_writer::end_tag('div');
-		
+
 		echo html_writer::start_tag('div', array('id' => 'results', 'class' => 'col right'));
 			echo $searchBlock->display->showResults($results['tables']);
 		echo html_writer::end_tag('div');
 	}
-			
+
 }
 
 echo html_writer::tag('div', '', array('class' => 'clear'));

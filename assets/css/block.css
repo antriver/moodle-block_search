@@ -1,9 +1,9 @@
 /* Styles used by the search block when displayed as a block on a normal Moodle page */
 
 .searchBlockForm > * {
-	box-sizing: border-box;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
+	box-sizing: border-box;
 	padding:3px;
 }
 
