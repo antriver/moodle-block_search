@@ -45,6 +45,7 @@ if ($courseID) {
 	$PAGE->set_context(context_system::instance());
 }
 
+$PAGE->requires->jquery();
 $PAGE->set_url('/blocks/search');
 $PAGE->requires->css('/blocks/search/assets/css/page.css');
 
