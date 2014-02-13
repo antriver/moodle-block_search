@@ -157,8 +157,6 @@ class Search
 			'cached' => false,
 			'total' => 0
 		);
-		$q = strtolower($this->q);
-		$q = "%{$q}%";
 
 		//Search each table we're supposed to search in
 		foreach ($this->tables as $table => $fields) {
@@ -166,26 +164,28 @@ class Search
 			$where = '';
 
 			//Array of query values
-			$values = array();
+			$queryParameters = array();
 
 			//Build the SQL query
 			foreach ($fields as $fieldName) {
-				$where .= ' OR LOWER(' . $fieldName . ') LIKE ?';
-				$values[] = $q;
+				$where .= $this->buildWordQuery($fieldName, $this->q, $queryParameters) . ' OR ';
 			}
-			$where = ltrim($where, ' OR ');
+			$where = rtrim($where, 'OR ');
 
 			if ($this->courseID) {
 				$where = "({$where})";
 				$where .= ' AND course = ?';
-				$values[] = $this->courseID;
+				$queryParameters[] = $this->courseID;
 			}
 
 			//Full query
 			$sql = 'SELECT * FROM {' . $table . '} WHERE ' . $where;
 
+			#echo($sql);
+			#print_object($queryParameters);
+
 			//Run the query and return the matched rows
-			if ($tableResults = $DB->get_records_sql($sql, $values)) {
+			if ($tableResults = $DB->get_records_sql($sql, $queryParameters)) {
 				$results['tables'][$table] = $tableResults;
 			}
 		}
@@ -213,6 +213,106 @@ class Search
 		$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 
 		return $results;
+	}
+
+
+	/**
+	 * Find files in folder modules
+	 * This is a bit more complicated than a simple search, hence the separate method
+	 * @return [type] [description]
+	 */
+	private function searchFolderFiles()
+	{
+		if (empty($this->q)) {
+			throw new \Exception('No query was given.');
+		}
+
+		$sql = '
+select
+	files.filepath,
+	files.filename,
+	ctx.instanceid as folderid,
+	folder.name as foldername,
+	folder.course as courseid
+from
+	ssismdl_files files
+join
+	ssismdl_context ctx on files.contextid = ctx.id
+join
+	ssismdl_course_modules modules on modules.id = ctx.instanceid
+join
+	ssismdl_folder folder on folder.id = modules.instance
+
+where files.filename like ?';
+
+	}
+
+
+
+	/**
+	 * Splits the query string into words and phrases as appropriate and returns
+	 * a portion of to match the given column name against.
+	 *
+	 * e.g. 'Two Words'
+	 * returns
+	 * ( columnName LIKE %two%' AND columnName LIKE %words% )
+	 */
+	private function buildWordQuery($columnName, $searchTerms, &$queryParameters = array())
+	{
+		$searchTerms = strtolower($searchTerms);
+
+		$columnName = "LOWER({$columnName})";
+
+		// "Words in quotes" to search exact phrases
+		$queryExact = '';
+		if (preg_match_all('/"[\w|\s|\']+"/i', $searchTerms, $matches)) {
+			foreach($matches[0] as $match)
+			{
+				$queryExact .= "{$columnName} LIKE ? AND ";
+
+				//Remove the match from the search terms because we're done with it
+				$searchTerms = str_replace($match, '', $searchTerms);
+
+				//Remove quotes from the match
+				$match = trim($match, '"');
+				$queryParameters[] = '%' . $match . '%';
+			}
+		}
+		// -Word to exclude words
+		$queryExclude = '';
+		if (preg_match_all('/\-\w+/i', $searchTerms, $matches)) {
+			foreach($matches[0] as $match) {
+
+				$queryExclude .= "{$columnName} NOT LIKE ? AND ";
+
+				//Remove the match from the search terms because we're done with it
+				$searchTerms = str_replace($match, '', $searchTerms);
+
+				//Remove - from the match
+				$match = ltrim($match, '-');
+				$queryParameters[] = '%' . $match . '%';
+			}
+		}
+
+		//Now the advanced parameters have been dealt with and removed from $searchTerms
+		//We're just left with words we want to look for
+		$queryWords = '';
+		$searchTerms = trim($searchTerms);
+		$searchWords = explode(' ', trim($searchTerms));
+		foreach ($searchWords as $word) {
+			if (empty($word)) {
+				continue;
+			}
+
+			$queryWords .= "{$columnName} LIKE ? AND ";
+			$queryParameters[] = '%' . $word . '%';
+		}
+
+		//Now stick it together
+		$where = '(' . $queryExact . $queryExclude . $queryWords;
+		$where = rtrim($where, 'AND ') . ')';
+
+		return $where;
 	}
 
 
