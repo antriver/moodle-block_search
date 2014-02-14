@@ -39,22 +39,24 @@ class block_search extends block_base
 	public function get_content()
 	{
 		global $CFG, $OUTPUT, $PAGE;
-	
+
 		//Include the CSS for the block
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
-		
+
 		require_once dirname(__FILE__) . '/MoodleSearch/Block.php';
 		$searchBlock = new \MoodleSearch\Block();
-		
+
+		$q = isset($_GET['q']) ? $_GET['q'] : false;
+
 		$this->content = new stdClass;
 		$this->content->text = $searchBlock->display->showSearchBox(
-			$_GET['q'],
+			$q,
 			$this->page->course->id,
 			false,
 			false,
 			get_string('search_input_text_block', 'block_search')
 		);
-		
+
 		return $this->content;
 	}
 

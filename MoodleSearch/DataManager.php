@@ -28,7 +28,7 @@ namespace MoodleSearch;
 class DataManager
 {
 	private static $cache;
-	
+
 	//Returns the unique instance ID for a resource across all of moodle
 	//given an ID which is unique only to that module
 	public static function getGlobalInstanceIDFromModuleInstanceID($moduleName, $moduleInstanceID)
@@ -42,38 +42,42 @@ class DataManager
 			)
 		);
 	}
-	
+
 	//Returns the ID for an installed module (plugin), given the name of the module
 	public static function getModuleID($moduleName)
 	{
 		return self::getDBField('modules', 'id', array('name' => $moduleName));
 	}
-	
+
 	//Get a course record
 	public static function getCourse($courseID)
 	{
 		return self::getDBRecord('course', array('id' => $courseID));
 	}
-	
+
 	//Returns the fullname for a course
 	public static function getCourseName($courseID)
 	{
 		$course = self::getCourse($courseID);
 		return $course->fullname;
 	}
-	
+
 	//Returns the row for a section in a course
 	public static function getSection($sectionID)
 	{
 		return self::getDBRecord('course_sections', array('id' => $sectionID));
 	}
-	
+
 	//Returns information about a section a resource is in
 	public static function getResourceSection($moduleName, $instanceID)
 	{
-		//Get the id of the plugin for the module module
+		//Get the module id from the module's name
 		$moduleID = self::getModuleID($moduleName);
-				
+
+		if (!$moduleID) {
+			return false;
+		}
+
 		//Get the sectionID the resource is in
 		$sectionID = self::getDBField(
 			'course_modules',
@@ -83,81 +87,102 @@ class DataManager
 				'instance' => $instanceID
 			)
 		);
-						
+
+		if (!$sectionID) {
+			return false;
+		}
+
 		return self::getSection($sectionID);
 	}
-	
-	
-	
+
+	public static function getResoureSectionFromCourseModuleID($courseModuleID)
+	{
+		$sectionID = self::getDBField(
+			'course_modules',
+			'section',
+			array(
+				'id' => $courseModuleID
+			)
+		);
+
+		if (!$sectionID) {
+			return false;
+		}
+
+		return self::getSection($sectionID);
+	}
+
+
+
 	public static function canUserSeeModule($courseID, $module, $idInModule)
 	{
 		//Current logged in user
 		global $USER;
-		
+
 		//Get the overall coursemodule ID, from the module's ID inside the plugin
 		$cmid = self::getGlobalInstanceIDFromModuleInstanceID($module, $idInModule);
-		
+
 		//Load the "modinfo" for the course, and see if the module is "uservisible"
 		//This is pretty expensive and is likely the source of any slowness,
 		//because get_fast_modinfo loads info for all the modules in the course
 		//even though we only want the one
 		$modinfo = get_fast_modinfo($courseID, $USER->id);
-		
+
 		try {
 			$mod = $modinfo->get_cm($cmid);
 			//Throws a moodle_exception if it's not found
 		} catch (\moodle_exception $e) {
 			return false;
 		}
-		
+
 		//If the module says it's not visible, don't show it
 		if (!$mod->uservisible) {
 			return false;
 		}
-		
+
 		//It still might not be right to show it, because some plugins still want to be shown
 		//but the user will just see "you don't have permission" when they click it
 		//So let's handle each plugin that's awkward and check if the user has whatever capability applies to it
 		switch ($module) {
-		
+
 			case 'chat':
 				$capability = 'mod/chat:chat';
 				break;
-				
+
 			case 'choice':
 				$capability = 'mod/choice:readresponses';
 				break;
-				
+
 			case 'data':
 				$capability = 'mod/data:viewentry';
 				break;
-				
+
 			case 'forum':
 				$capability = 'mod/forum:viewdiscussion';
 				break;
-					
+
 			/*case 'lesson':
 				//The view.php only checks for :manage. Maybe there's no view capability for this plugin?
-				$capability = 'mod/lesson:manage'; 
+				$capability = 'mod/lesson:manage';
 				break;*/
-				
+
 			/*case 'survey': //questionnaire the same plugin?
 				$capability = 'mod/questionnaire:view';
 				break;*/
-				
+
 			case 'wiki':
 				$capability = 'mod/wiki:viewpage';
 				break;
-				
+
 			case '	book':
 				$capability = 'mod/book:read';
 				break;
-				
+
 			case 'label':
 				//There's no view capability for labels - everybody can see
 				break;
 		}
-		
+
 		//If this plugin has a capability we can check
 		if (!empty($capability)) {
 			//Check if the user has the capability within the module context
@@ -166,46 +191,46 @@ class DataManager
 				return false;
 			}
 		}
-		
+
 		//Now they can see it
 		return true;
 	}
-	
+
 
 	//Gets a single field from a table in the database (cached)
 	private static function getDBField($tableName, $fieldName, $where)
 	{
 		$hash = md5("field{$tableName}{$fieldName}".http_build_query($where));
-		
-		if ($res = self::getCache()->get($hash)) {
+
+		if (false && $res = self::getCache()->get($hash)) {
 			return $res;
 		}
-		
+
 		global $DB;
-		$res =$DB->get_field($tableName, $fieldName, $where);
-		
+		$res = $DB->get_field($tableName, $fieldName, $where);
+
 		self::getCache()->set($hash, $res);
-		
+
 		return $res;
 	}
-	
+
 	//Gets a single row from a table in the database (cached)
 	private static function getDBRecord($tableName, $where)
 	{
 		$hash = md5("record{$tableName}".http_build_query($where));
-		
-		if ($res = self::getCache()->get($hash)) {
+
+		if (false && $res = self::getCache()->get($hash)) {
 			return $res;
 		}
-		
+
 		global $DB;
 		$res = $DB->get_record($tableName, $where);
-		
+
 		self::getCache()->set($hash, $res);
-		
+
 		return $res;
 	}
-	
+
 	//Returns the cache object
 	//Creates a new one when called for the first time
 	public static function getCache()
@@ -213,64 +238,64 @@ class DataManager
 		if (!empty(self::$cache)) {
 			return self::$cache;
 		}
-		
+
 		self::$cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'block_search', 'cache');
-		
+
 		return self::$cache;
 	}
-	
+
 	public static function getTablesPossibleToSearch()
 	{
 		global $DB;
-		
+
 		$tables = array();
-		
+
 		//Courses table
 		$tables['course'] = 'course (fullname, shortname)';
-		
+
 		//Database manager object
 		$dbman = $DB->get_manager();
-		
+
 		//Get all modules (plugins) - we're going to search their tables
 		$modules = $DB->get_records('modules', array(), 'name');
-		
+
 		foreach ($modules as $module) {
-		
+
 			$tableName = $module->name;
 			$tableFields = array();
-			
+
 			//Create an xmldb object from the name of this table
 			$table = new \xmldb_table($tableName);
-		
+
 			//Skip this module if it has no table
 			//(Only checks if a table with the same name as the module exists)
 			if (!$dbman->table_exists($table)) {
 				continue;
 			}
-			
+
 			//We want to check if these fields exist in the table
 			$possibleFields = array('name', 'intro');
-		
+
 			//Check if each of these fields (columns) exists in the table
 			foreach ($possibleFields as $fieldName) {
-	
+
 				//Create an xmldb object for this field's name
 				$field = new \xmldb_field($fieldName);
-				
+
 				//If this field exists in the table, we're going to search in it
 				if ($dbman->field_exists($table, $field)) {
 					$tableFields[] = $fieldName;
 				}
-				
+
 			}
 
 			$tables[$tableName] = $tableName . ' (' .implode(', ', $tableFields) . ')';
-				
+
 		} //end foreach module
-		
+
 		return $tables;
 	}
-	
+
 	//Returns the current time in microseconds.
 	//Used for timing how long things take
 	public static function getDebugTime()
@@ -279,7 +304,7 @@ class DataManager
 		$timer = $timer[1] + $timer[0];
 		return $timer;
 	}
-	
+
 	public static function debugTimeTaken($startTime)
 	{
 		return round((self::getDebugTime() - $startTime), 4);

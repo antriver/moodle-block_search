@@ -125,6 +125,10 @@ if (!empty($results)) {
 		echo '<br/>';
 		echo get_string('filtering_took', 'block_search', $results['filterTime']);
 	}
+	if (!empty($searchBlock->display->displayTime)) {
+		echo '<br/>';
+		echo get_string('displaying_took', 'block_search', $searchBlock->display->displayTime);
+	}
 	echo '</div>';
 }
 

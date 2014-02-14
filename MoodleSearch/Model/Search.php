@@ -31,13 +31,17 @@ class Search
 	private $results = null;
 	private $courseID = false;
 	private $tables = false;
-	private $info = array();
+	private $refreshCache = false;
 
 	public function __construct($q, $courseID = false)
 	{
 		$this->q = $q;
 		$this->courseID = $courseID;
 		$this->results = $this->runSearch();
+
+		if (isset($_GET['refresh'])) {
+			$this->refreshCache = true;
+		}
 	}
 
 	public function getResults()
@@ -128,21 +132,23 @@ class Search
 
 		$cache_for = get_config('block_search', 'cache_results');
 		$cache = $cache_for > 0 ? true : false;
-
+$cache = false;
 		if ($cache) {
 
 			$hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
 
-			//Check if cached results exists
-			$results = DataManager::getCache()->get($hash);
+			if (!$this->refreshCache) {
+				//Check if cached results exists
+				$results = DataManager::getCache()->get($hash);
 
-			if (is_array($results)) {
+				if (is_array($results)) {
 
-				//If the cached results are newer than than the cache_results setting we'll use them
-				if ($results['generated'] > (time() - (int)$cache_for)) {
-					$results['searchTime'] = DataManager::debugTimeTaken($startTime);
-					$results['cached'] = true;
-					return $results;
+					//If the cached results are newer than than the cache_results setting we'll use them
+					if ($results['generated'] > (time() - (int)$cache_for)) {
+						$results['searchTime'] = DataManager::debugTimeTaken($startTime);
+						$results['cached'] = true;
+						return $results;
+					}
 				}
 			}
 
@@ -160,7 +166,6 @@ class Search
 
 		//Search each table we're supposed to search in
 		foreach ($this->tables as $table => $fields) {
-
 			$where = '';
 
 			//Array of query values
@@ -181,14 +186,15 @@ class Search
 			//Full query
 			$sql = 'SELECT * FROM {' . $table . '} WHERE ' . $where;
 
-			#echo($sql);
-			#print_object($queryParameters);
-
 			//Run the query and return the matched rows
 			if ($tableResults = $DB->get_records_sql($sql, $queryParameters)) {
 				$results['tables'][$table] = $tableResults;
 			}
 		}
+
+		//Also search files in folders
+		//TODO: This isn't ready yet
+		//$results['tables']['filesInFolders'] = $this->searchFilesInFolders();
 
 		if (count($results['tables']) < 1) {
 			DataManager::getCache()->set($hash, $results);
@@ -196,12 +202,29 @@ class Search
 			return $results;
 		}
 
-		require_once __DIR__ . '/Result.php';
-
 		//Convert the rows from the database into Result objects
 		foreach ($results['tables'] as $tableName => &$tableResults) {
+			switch ($tableName) {
+				case 'course':
+					$className = 'CourseResult';
+					break;
+
+				case 'course_categories':
+					$className = 'CategoryResult';
+					break;
+
+				case 'filesInFolders':
+					$className = 'FileInFolderResult';
+					break;
+
+				default:
+					$className = 'ModuleResult';
+					break;
+			}
+			$className = '\MoodleSearch\\' . $className;
+
 			foreach ($tableResults as &$row) {
-				$row = new Result($tableName, $row);
+				$row = new $className($tableName, $row);
 				++$results['total'];
 			}
 		}
@@ -221,30 +244,42 @@ class Search
 	 * This is a bit more complicated than a simple search, hence the separate method
 	 * @return [type] [description]
 	 */
-	private function searchFolderFiles()
+	private function searchFilesInFolders()
 	{
+		global $DB;
+
 		if (empty($this->q)) {
 			throw new \Exception('No query was given.');
 		}
 
 		$sql = '
-select
+SELECT
+	files.id,
 	files.filepath,
 	files.filename,
-	ctx.instanceid as folderid,
+	files.mimetype,
+	context.instanceid as folderid,
+	context.id as contextid,
+	course_modules.id as moduleid,
+	course_modules.visible as modulevisible,
 	folder.name as foldername,
 	folder.course as courseid
-from
-	ssismdl_files files
-join
-	ssismdl_context ctx on files.contextid = ctx.id
-join
-	ssismdl_course_modules modules on modules.id = ctx.instanceid
-join
-	ssismdl_folder folder on folder.id = modules.instance
+FROM
+	{files} files
+JOIN
+	{context} context ON files.contextid = context.id
+JOIN
+	{course_modules} course_modules ON course_modules.id = context.instanceid
+JOIN
+	{folder} folder ON folder.id = course_modules.instance
+WHERE ';
 
-where files.filename like ?';
+		$queryParameters = array();
+		$sql .= $this->buildWordQuery('files.filename', $this->q, $queryParameters);
 
+		$fileResults = $DB->get_records_sql($sql, $queryParameters);
+
+		return $fileResults;
 	}
 
 
@@ -263,11 +298,13 @@ where files.filename like ?';
 
 		$columnName = "LOWER({$columnName})";
 
+		//Replace character for wildcards
+		$searchTerms = str_replace('*', '%', $searchTerms);
+
 		// "Words in quotes" to search exact phrases
 		$queryExact = '';
 		if (preg_match_all('/"[\w|\s|\']+"/i', $searchTerms, $matches)) {
-			foreach($matches[0] as $match)
-			{
+			foreach ($matches[0] as $match) {
 				$queryExact .= "{$columnName} LIKE ? AND ";
 
 				//Remove the match from the search terms because we're done with it
@@ -281,7 +318,7 @@ where files.filename like ?';
 		// -Word to exclude words
 		$queryExclude = '';
 		if (preg_match_all('/\-\w+/i', $searchTerms, $matches)) {
-			foreach($matches[0] as $match) {
+			foreach ($matches[0] as $match) {
 
 				$queryExclude .= "{$columnName} NOT LIKE ? AND ";
 
@@ -322,8 +359,6 @@ where files.filename like ?';
 	*/
 	public function filterResults($removeHiddenResults = true)
 	{
-		global $USER;
-
 		//Site admin can see everything so don't bother filtering
 		if (is_siteadmin()) {
 			return;
@@ -331,36 +366,24 @@ where files.filename like ?';
 
 		$startTime = DataManager::getDebugTime();
 
+		//Check if each result is visible
 		foreach ($this->results['tables'] as $tableName => &$tableResults) {
 			foreach ($tableResults as $i => &$result) {
 
-				switch ($tableName) {
-
-					//Remove unenroled courses
-					case 'course':
-						$this->removeResultIfUserNotEnroledInCourse(
-							$result->getRow()->id,
-							$i,
-							$tableResults,
-							$removeHiddenResults
-						);
-						break;
-
-					//Remove resources from unenroled courses
-					default:
-						if (!$this->removeResultIfUserNotEnroledInCourse(
-							$result->getRow()->course,
-							$i,
-							$tableResults,
-							$removeHiddenResults
-						)) {
-							$this->removeResourceIfHidden($result, $i, $tableResults, $removeHiddenResults);
-						}
-						break;
+				$visible = $result->isVisible();
+				if ($visible !== true) {
+					if ($removeHiddenResults) {
+						unset($tableResults[$i]);
+					} else {
+						$tableResults[$i]->hiddenReason = $visible;
+						$tableResults[$i]->hidden = true;
+					}
 				}
-
 			}
 		}
+
+		unset($result);
+		unset($tableResults);
 
 		if ($removeHiddenResults) {
 
@@ -389,63 +412,5 @@ where files.filename like ?';
 		}
 
 		$this->results['filterTime'] = DataManager::debugTimeTaken($startTime);
-	}
-
-
-	/*
-	*	Checks if a user is enroled in the given courseid.
-	*	If not...
-	*		If $remove == true
-	*			Item number $i is removed from the array (reference) $tableResults
-	*			Then returns true
-	*		if $remove == false
-	*			Item number $i is in the the array (reference) $tableResults has its 'hidden' property set to true
-	*			Then returns true
-	*/
-	private function removeResultIfUserNotEnroledInCourse($courseid, $i, &$tableResults, $remove = true)
-	{
-		global $USER;
-
-		$coursecontext = \context_course::instance($courseid);
-
-		if (is_enrolled($coursecontext, $USER)) {
-			//They're enroled in the course. We don't have to do anyhting
-			return false;
-		} else {
-			if ($remove) {
-				unset($tableResults[$i]);
-			} else {
-				$tableResults[$i]->hiddenReason = 'notenrolled';
-				$tableResults[$i]->hidden = true;
-			}
-			return true;
-		}
-	}
-
-
-
-	/*
-		Checks if a user is can view a resource even if they're enroled in the course
-		If not...
-			If $remove == true
-				Item number $i is removed from the array (reference) $tableResults
-			if $remove == false
-				Item number $i is in the the array (reference) $tableResults has its 'hidden' property set to true
-	*/
-	private function removeResourceIfHidden($result, $i, &$tableResults, $remove = true)
-	{
-
-		$visible = DataManager::canUserSeeModule($result->getRow()->course, $result->tableName, $result->getRow()->id);
-		//var_dump($result->name());
-		//var_dump($visible);
-		//echo '<br/>';
-		if ($visible) {
-			//They can see it. Yay
-		} elseif ($remove) {
-			unset($tableResults[$i]);
-		} else {
-			$tableResults[$i]->hiddenReason = 'notvisible';
-			$tableResults[$i]->hidden = true;
-		}
 	}
 }

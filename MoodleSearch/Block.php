@@ -31,8 +31,15 @@ class Block
 
 	public function __construct()
 	{
-		//Autoloader would be nice here
+		error_reporting(E_ALL);
+		ini_set('display_errors', 1);
+
+		//TODO: Autoloader would be nice here
 		require_once __DIR__ . '/Model/Result.php';
+		require_once __DIR__ . '/Model/Results/CourseResult.php';
+		require_once __DIR__ . '/Model/Results/CategoryResult.php';
+		require_once __DIR__ . '/Model/Results/FileInFolderResult.php';
+		require_once __DIR__ . '/Model/Results/ModuleResult.php';
 		require_once __DIR__ . '/Model/Search.php';
 		require_once __DIR__ . '/DataManager.php';
 		require_once __DIR__ . '/DisplayManager.php';
@@ -44,7 +51,7 @@ class Block
 		global $CFG;
 		return $CFG->dirroot . $this->path;
 	}
-	
+
 	public function getFullURL()
 	{
 		global $CFG;

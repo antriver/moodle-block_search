@@ -29,7 +29,7 @@
 		-moz-box-sizing: border-box;
 		padding:10px;
 	}
-	
+
 	.searchBlockForm > label {
 		font-size:12px;
 		display:inline-block;
@@ -43,15 +43,15 @@
 		margin-right:1%;
 		font-size:15px;
 	}
-	
+
 	.searchBlockForm button {
 		width:30%;
 		font-size:15px;
 		margin-top: -3px;
 		padding: 11px 10px;
 	}
-	
-	
+
+
 
 
 #block_search .col {
@@ -65,17 +65,17 @@
 		width:25%;
 		padding-right: 12px;
 	}
-	
+
 	#block_search .col.right {
 		width:75%;
 		padding-left: 12px;
 	}
-	
-	
-	
+
+
+
 
 /* Search results quick nav box on left */
-	
+
 #block_search #resultsNav {
 	background: #FFF;
 	margin: 0 0 15px 0;
@@ -102,7 +102,7 @@
 		#block_search #resultsNav li i {
 			padding-right: 8px;
 		}
-		
+
 		#block_search #resultsNav li a {
 			display:block;
 			-webkit-border-radius: 3px;
@@ -110,17 +110,17 @@
 			border-radius: 3px;
 			padding:5px;
 		}
-		
+
 			#block_search #resultsNav li a:hover {
 				background:#EEE;
 			}
-		
+
 		#block_search #resultsNav li a span {
 			float:right;
 			color:#AAA;
 		}
-		
-		
+
+
 /* Full search results on right */
 
 #block_search #results h3 {
@@ -155,25 +155,30 @@
 	#block_search ul.results > li:last-child {
 		margin-bottom:0;
 	}
-	
+
 	#block_search a.resultLink {
 		font-size:16px;
 		font-weight:bold;
 	}
-	
+
 		#block_search #results a.resultLink img.icon {
 			padding-right:5px;
 		}
-	
+		#block_search #results a.resultLink img.smallicon {
+			padding-right:5px;
+			position: relative;
+			top:2px;
+		}
+
 		#block_search a.resultLink i {
 			padding-right:5px;
 		}
-	
+
 	#block_search ul.results li p {
 		padding:5px;
 		font-size:13px;
 	}
-	
+
 	/* Hidden results (user doesn't have access) */
 	#block_search #results li.hidden {
 		opacity:.8;
@@ -181,24 +186,24 @@
 		#block_search #results li.hidden a {
 			color:#AAA;
 		}
-		
+
 		/* Make icons in hidden results greyscale */
 		#block_search #results li.hidden img {
 			filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */
 		    filter: gray; /* IE6-9 */
 		    -webkit-filter: grayscale(100%); /* Chrome 19+, Safari 6+, Safari 6+ iOS */
 		}
-		
+
 		#block_search #results li.hidden p {
 			color:#AAA;
 		}
-	
+
 	#block_search #results li h5.hiddenReason {
 		color:#AAA;
 		font-size:12px;
 		margin:5px 0;
 	}
-	
+
 	/* Path to search results */
 	#block_search ul.path {
 		font-size:11px;
@@ -219,7 +224,7 @@
 			#block_search ul.path li:hover {
 				opacity:1;
 			}
-			
+
 			#block_search ul.path li:after {
 				content:">";
 				padding:0 6px;
@@ -228,15 +233,15 @@
 				#block_search ul.path li:last-child:after {
 					content:"";
 				}
-				
+
 	#block_search .searchInfo {
 		text-align:center;
 		font-size:10px;
 		color:#BDBDBD;
 	}
-	
+
 	#block_search .clear {
 		clear:both;
 	}
-				
-					
+
+

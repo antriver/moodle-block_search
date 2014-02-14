@@ -26,6 +26,7 @@ namespace MoodleSearch;
 class DisplayManager
 {
 	private $block;
+	public $displayTime = 0;
 
 	public function __construct(\MoodleSearch\Block $block)
 	{
@@ -190,6 +191,8 @@ class DisplayManager
 	//Takes the result set from a search and makes HTML to show it nicely
 	public function showResults($results)
 	{
+		$startTime = DataManager::getDebugTime();
+
 		$r = '';
 
 		foreach ($results as $tableName => $tableResults) {
@@ -213,6 +216,8 @@ class DisplayManager
 			$r .= \html_writer::end_tag('ul');
 		}
 
+		$this->displayTime = DataManager::debugTimeTaken($startTime);
+
 		return $r;
 	}
 
@@ -235,6 +240,12 @@ class DisplayManager
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-archive'))
 				);
 				break;
+			case 'filesInFolders':
+				return array(
+					'title' => get_string('folder_contents', 'block_search'),
+					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-close'))
+				);
+				break;
 			default:
 				if ($pluginName = get_string('pluginname', "mod_{$tableName}")) {
 					return array(
@@ -252,7 +263,7 @@ class DisplayManager
 
 	//Gets all the information needed to show a row nicely in the search results
 	// e.g. gets the "path" to an activity, the URL, the icon etc.
-	private function showResult($tableName, $result, $sectionIcon = false)
+	private function showResult($tableName, $result, $defaultSectionIcon = false)
 	{
 		$liClasses = '';
 
@@ -272,17 +283,22 @@ class DisplayManager
 				$niceHiddenReason = get_string('hidden_not_available', 'block_search');
 			}
 
-			$icon = \html_writer::tag('i', '', array('class' => 'icon icon-remove'));
+			$hiddenIcon = \html_writer::tag('i', '', array('class' => 'icon icon-remove'));
 			$r .= \html_writer::tag(
 				'h5',
-				$icon . ' ' .$niceHiddenReason,
+				$hiddenIcon . ' ' .$niceHiddenReason,
 				array('class' => 'hiddenReason')
 			);
 		}
 
+		$icon = $result->icon();
+		if (!$icon) {
+			$icon = $defaultSectionIcon;
+		}
+
 		$r .= \html_writer::tag(
 			'a',
-			$sectionIcon . $result->name(),
+			$icon . $result->name(),
 			array(
 				'class' => 'resultLink',
 				'href' => $result->url()

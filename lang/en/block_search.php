@@ -45,11 +45,13 @@ $string['items_found'] = '{$a} Items Found';
 $string['no_results'] = 'Sorry, there were no results for your search.';
 $string['hidden_not_enrolled'] = 'You are not enrolled in this course.';
 $string['hidden_not_available'] = 'This resource has not been made available to you.';
+$string['folder_contents'] = 'Files Inside Folders';
 
 //Search stats
 $string['search_took'] = 'Search took <strong>{$a}</strong> seconds.';
 $string['cached_results_generated'] = 'Cached results from <strong>{$a}</strong>.';
 $string['filtering_took'] = 'Filtering results took <strong>{$a}</strong> seconds.';
+$string['displaying_took'] = 'Displaying results took <strong>{$a}</strong> seconds.';
 
 //Admin settings
 $string['settings_search_tables_name'] = 'Search Tables';
