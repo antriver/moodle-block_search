@@ -22,6 +22,10 @@
 	font-weight: bold;
 }
 
+#block_search .paging:empty {
+	margin:0;
+}
+
 /* Search form */
 
 #block_search .searchBlockForm {
@@ -134,7 +138,7 @@
 #block_search #results h3 {
 	margin-top:30px;
 }
-	#block_search #results h3:first-child {
+	#block_search #results h3:nth-of-type(1) {
 		margin-top:0;
 	}
 

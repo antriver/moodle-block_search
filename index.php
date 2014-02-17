@@ -153,8 +153,17 @@ if (!empty($q)) {
 		echo html_writer::end_tag('div');
 	}
 
+	echo html_writer::tag('div', '', array('class' => 'clear'));
+
+} else {
+
+	/*
+	 * Advanced Search Options
+	 */
+	echo $searchBlock->display->showAdvancedOptions();
+
+
 }
-echo html_writer::tag('div', '', array('class' => 'clear'));
 
 
 /*
