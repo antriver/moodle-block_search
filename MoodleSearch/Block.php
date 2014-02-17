@@ -62,7 +62,13 @@ class Block
 	{
 		//Check if user cached results exist
 		$userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
-		if ($userCacheValidFor > 0) {
+		$useUserCache = $userCacheValidFor > 0;
+
+		if (is_siteadmin()) {
+			$useUserCache = false;
+		}
+
+		if ($useUserCache) {
 
 			$cacheKey = md5(json_encode(array($q, $courseID, $removeHiddenResults)));
 
@@ -81,7 +87,7 @@ class Block
 		$search->filterResults($removeHiddenResults);
 		$results = $search->getResults();
 
-		if ($userCacheValidFor > 0) {
+		if ($useUserCache) {
 			$userCache->set($cacheKey, $results);
 		}
 
