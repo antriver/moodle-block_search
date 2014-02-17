@@ -26,7 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 class block_search extends block_base
 {
 
-	public function init() {
+	public function init()
+	{
 		if (!empty($this->page->course)) {
 			$this->title = get_string('searchverb', 'block_search') . $this->page->course->fullname;
 		} else {
@@ -35,13 +36,14 @@ class block_search extends block_base
 	}
 
 	// Set the content of the block when displayed as a block on a page.
-	public function get_content() {
+	public function get_content()
+	{
 		global $CFG, $OUTPUT, $PAGE;
 
 		// Include the CSS for the block.
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
 
-		require_once dirname(__FILE__) . '/MoodleSearch/Block.php';
+		require_once(dirname(__FILE__) . '/MoodleSearch/Block.php');
 		$searchBlock = new \MoodleSearch\Block();
 
 		$q = isset($_GET['q']) ? $_GET['q'] : false;
@@ -58,7 +60,6 @@ class block_search extends block_base
 		return $this->content;
 	}
 
-	// my moodle can only have SITEID and it's redundant here, so take it away
 	public function applicable_formats()
 	{
 		return array(
@@ -72,23 +73,21 @@ class block_search extends block_base
 		);
 	}
 
-
-	//Can multiple instance of this block be added to the same page?
+	/**
+	 * Can multiple instance of this block be added to the same page?
+	 * @return bool
+	 */
 	public function instance_allow_multiple()
 	{
 		return true;
 	}
 
-	//Do we have a settings.php file? (Global admin settings for the block)
+	/**
+	 * Do we have a settings.php file? (Global admin settings for the block)
+	 * @return bool
+	 */
 	public function has_config()
 	{
 		return true;
 	}
-
-	/*public function cron()
-	{
-		mtrace("Hey, my cron script is running");
-		// do something
-		return true;
-	}*/
 }

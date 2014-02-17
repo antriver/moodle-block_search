@@ -57,5 +57,4 @@ class ModuleResult extends Result
 			return 'notvisible';
 		}
 	}
-
 }

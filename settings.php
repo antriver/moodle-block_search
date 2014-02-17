@@ -23,22 +23,29 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once $CFG->dirroot . '/blocks/search/MoodleSearch/DataManager.php';
+require_once($CFG->dirroot . '/blocks/search/MoodleSearch/DataManager.php');
 
-//Tables
+/*
+ * Tables to search
+ */
 $possibleTables = \MoodleSearch\DataManager::getTablesPossibleToSearch();
 $settings->add(
 	new admin_setting_configmulticheckbox(
 		'block_search/search_tables',
 		get_string('settings_search_tables_name', 'block_search'),
-		get_string('settings_search_tables_desc', 'block_search') .
-		' <a href="#" onclick="Y.all(\'#admin-search_tables input[type=checkbox]\').set(\'checked\', true); return false;">' . get_string('selectall', 'block_search') . '</a>',
+		get_string('settings_search_tables_desc', 'block_search')
+		. ' <a href="#" onclick=" '
+		. 'Y.all(\'#admin-search_tables input[type=checkbox]\').set(\'checked\', true); return false;">'
+		. get_string('selectall', 'block_search')
+		. '</a>',
 		'',
 		$possibleTables
 	)
 );
 
-//Search files in folders?
+/*
+ * Search files in folders?
+ */
 $settings->add(
 	new admin_setting_configcheckbox(
 		'block_search/search_files_in_folders',
@@ -48,7 +55,9 @@ $settings->add(
 	)
 );
 
-//Pagination
+/*
+ * Pagination
+ */
 $settings->add(
 	new admin_setting_configtext(
 		'block_search/results_per_page',
@@ -59,7 +68,9 @@ $settings->add(
 	)
 );
 
-//Cache
+/*
+ * Cache
+ */
 $settings->add(
 	new admin_setting_configtext(
 		'block_search/cache_results',
@@ -80,7 +91,9 @@ $settings->add(
 	)
 );
 
-//Logging
+/*
+ * Logging
+ */
 $settings->add(
 	new admin_setting_configcheckbox(
 		'block_search/log_searches',
@@ -90,7 +103,9 @@ $settings->add(
 	)
 );
 
-//Options
+/*
+ * Options
+ */
 $settings->add(
 	new admin_setting_configcheckbox(
 		'block_search/allow_no_access',
@@ -100,7 +115,9 @@ $settings->add(
 	)
 );
 
-//Text replacements
+/*
+ * Text replacements
+ */
 $settings->add(
 	new admin_setting_configtextarea(
 		'block_search/text_substitutions',

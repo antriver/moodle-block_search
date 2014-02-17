@@ -89,5 +89,4 @@ class FileInFolderResult extends Result
 			return 'notvisible';
 		}*/
 	}
-
 }

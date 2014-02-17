@@ -107,7 +107,7 @@ if (!empty($q)) {
 
 		$offset = $pageNum * $perPage;
 			echo '<p id="showing">'
-				. 'Showing ' 
+				. 'Showing '
 				. number_format($offset + 1)
 				. ' to '
 				. number_format(min(($offset + $perPage), $results['total']))
@@ -170,7 +170,7 @@ if (!empty($q)) {
  */
 if (!empty($results)) {
 	echo '<div class="searchInfo">';
-	
+
 	if (!empty($results['userCached'])) {
 		echo '<br/>';
 		echo get_string('user_cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
@@ -182,7 +182,7 @@ if (!empty($results)) {
 			echo '<br/>';
 			echo get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
 		}
-		
+
 		if (!empty($results['filterTime'])) {
 			echo '<br/>';
 			echo get_string('filtering_took', 'block_search', $results['filterTime']);

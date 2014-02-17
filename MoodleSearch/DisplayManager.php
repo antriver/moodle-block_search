@@ -171,9 +171,15 @@ class DisplayManager
 			$sectionDetails = $this->tableName($tableName);
 
 			if ($tableInfo['hiddenCount'] > 0) {
-				$countLabel = \html_writer::tag('span', $tableInfo['visibleCount'] . ' + ' . $tableInfo['count'] . ' hidden');
+				$countLabel = \html_writer::tag(
+					'span',
+					$tableInfo['visibleCount'] . ' + ' . $tableInfo['count'] . ' hidden'
+				);
 			} else {
-				$countLabel = \html_writer::tag('span', $tableInfo['visibleCount']);
+				$countLabel = \html_writer::tag(
+					'span',
+					$tableInfo['visibleCount']
+				);
 			}
 
 			if ($tableInfo['startPage'] == $currentPage) {
@@ -399,18 +405,20 @@ class DisplayManager
 	 */
 	public function showAdvancedOptions()
 	{
-		$r = '<div class="advancedOptions">';
-			$r .= '<h2><i class="icon-screenshot"></i> Advanced Search Options</h2>';
-			$r .= '<p>Add these words to your search to refine the results.</p>';
-			$r .= '<div class="col">';
-				$r .= '<p><em>-word</em> Find results that <strong>don\'t</strong> include that word.</p>';
-				$r .= '<p><em>&quot;words in quotes&quot;</em> Find results that contain this <strong>exact phrase</strong>.</p>';
-			$r .= '</div>';
-			$r .= '<div class="col">';
-				$r .= '<p><em>*ish</em> * is a <strong>wildcard</strong>. This would match both "English" and "Spanish".</p>';
-			$r .= '</div>';
-			$r .= '<div class="clear"></div>';
-		$r .= '</div>';
+		$r = '<div class="advancedOptions">'
+			. '<h2><i class="icon-screenshot"></i> Advanced Search Options</h2>'
+			. '<p>Add these words to your search to refine the results.</p>'
+			. '<div class="col">'
+				. '<p><em>-word</em> Find results that <strong>don\'t</strong> include that word.</p>'
+				. '<p><em>&quot;words in quotes&quot;</em> '
+				. 'Find results that contain this <strong>exact phrase</strong>.</p>'
+			. '</div>'
+			. '<div class="col">'
+				. '<p><em>*ish</em> * is a <strong>wildcard</strong>. '
+				. 'This would match both "English" and "Spanish".</p>'
+			. '</div>'
+			. '<div class="clear"></div>'
+		. '</div>';
 		return $r;
 	}
 }

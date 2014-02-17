@@ -34,5 +34,4 @@ class CourseResult extends Result
 			return 'notenrolled';
 		}
 	}
-
 }

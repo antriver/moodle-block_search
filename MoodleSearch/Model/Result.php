@@ -37,14 +37,14 @@ abstract class Result
 	}
 
 	//Returns the URL to take the user to when clicked
-	public abstract function url();
+	abstract public function url();
 
 	//Returns an array with the path to this row
 	// e.g. Teaching & Learning > English > English (7) > Activity Name
-	public abstract function path();
+	abstract public function path();
 
 	//Returns the HTML to display an icon for a result
-	public abstract function icon();
+	abstract public function icon();
 
 	//Checks if the current logged in user has access to this item
 	//Subclasses should override this. But the default here is just to make everything visible
