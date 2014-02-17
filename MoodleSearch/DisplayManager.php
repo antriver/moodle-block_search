@@ -362,4 +362,24 @@ class DisplayManager
 			return $string.$cutter;
 		}
 	}
+
+	/**
+	 * Returns the HTML for displaying the advanced search options to the user
+	 */
+	public function showAdvancedOptions()
+	{
+		$r = '<div class="advancedOptions">';
+			$r .= '<h2><i class="icon-screenshot"></i> Advanced Search Options</h2>';
+			$r .= '<p>Add these words to your search to refine the results.</p>';
+			$r .= '<div class="col">';
+				$r .= '<p><em>-word</em> Find results that <strong>don\'t</strong> include that word.</p>';
+				$r .= '<p><em>&quot;words in quotes&quot;</em> Find results that contain this <strong>exact phrase</strong>.</p>';
+			$r .= '</div>';
+			$r .= '<div class="col">';
+				$r .= '<p><em>*ish</em> * is a <strong>wildcard</strong>. This would match both "English" and "Spanish".</p>';
+			$r .= '</div>';
+			$r .= '<div class="clear"></div>';
+		$r .= '</div>';
+		return $r;
+	}
 }

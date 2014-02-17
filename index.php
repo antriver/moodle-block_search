@@ -49,7 +49,9 @@ $PAGE->requires->jquery();
 $PAGE->set_url('/blocks/search');
 $PAGE->requires->css('/blocks/search/assets/css/page.css');
 
-//Page title
+/**
+ * Page Title
+ */
 if (!empty($q)) {
 	$PAGE->set_title(get_string('search_results_for', 'block_search', $escapedq));
 
@@ -89,31 +91,49 @@ if (!empty($q)) {
 			array('class' => 'noResults')
 		);
 
+		/*
+		 * Advanced Search Options
+		 */
+		echo $searchBlock->display->showAdvancedOptions();
+
 	} else {
 
 		$icon = html_writer::tag('i', '', array('class' => 'icon-list-ul'));
 		echo html_writer::tag('h2', $icon . ' ' . get_string('search_results', 'block_search'));
 
-		//Show results
+		/*
+		 * Results menu (on the left)
+		 */
 		echo html_writer::start_tag('div', array('class' => 'col left'));
 			echo $searchBlock->display->showResultsNav($results);
 
-			//This is here so the leftcol still has content (and doesn't collapse)
-			//when the resultsNav becomes position:fixed when scrolling
+			// This is here so the leftcol still has content (and doesn't collapse)
+			// when the resultsNav becomes position:fixed when scrolling
 			echo '&nbsp;';
 
 		echo html_writer::end_tag('div');
 
+		/*
+		 * Show results
+		 */
 		echo html_writer::start_tag('div', array('id' => 'results', 'class' => 'col right'));
 			echo $searchBlock->display->showResults($results['tables']);
+
+			/*
+			 * Advanced Search Options
+			 */
+			echo $searchBlock->display->showAdvancedOptions();
+
 		echo html_writer::end_tag('div');
 	}
 
 }
-
 echo html_writer::tag('div', '', array('class' => 'clear'));
 
-//Show some info about the search
+
+/*
+ * Search Info
+ */
 if (!empty($results)) {
 	echo '<div class="searchInfo">';
 	echo get_string('search_took', 'block_search', $results['searchTime']);
@@ -134,6 +154,9 @@ if (!empty($results)) {
 
 echo html_writer::end_tag('div');
 
+/*
+ * Javascript
+ */
 echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.scrollTo.min.js"></script>';
 echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.localScroll.min.js"></script>';
 echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/block_search.js"></script>';
