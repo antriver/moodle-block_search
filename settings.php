@@ -48,6 +48,17 @@ $settings->add(
 	)
 );
 
+//Pagination
+$settings->add(
+	new admin_setting_configtext(
+		'block_search/results_per_page',
+		get_string('settings_results_per_page_name', 'block_search'),
+		get_string('settings_results_per_page_desc', 'block_search'),
+		100,
+		PARAM_INT
+	)
+);
+
 //Cache
 $settings->add(
 	new admin_setting_configtext(
@@ -55,6 +66,16 @@ $settings->add(
 		get_string('settings_cache_results_name', 'block_search'),
 		get_string('settings_cache_results_desc', 'block_search'),
 		86400,
+		PARAM_INT
+	)
+);
+
+$settings->add(
+	new admin_setting_configtext(
+		'block_search/cache_results_per_user',
+		get_string('settings_cache_results_per_user_name', 'block_search'),
+		get_string('settings_cache_results_per_user_desc', 'block_search'),
+		900,
 		PARAM_INT
 	)
 );

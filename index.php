@@ -33,6 +33,7 @@ $searchBlock = new MoodleSearch\Block();
 $q = optional_param('q', '', PARAM_RAW);
 $escapedq = htmlentities($q);
 $courseID = optional_param('courseID', 0, PARAM_INT);
+$pageNum = optional_param('page', 0, PARAM_INT);
 $showHiddenResults = optional_param('showHiddenResults', false, PARAM_BOOL);
 
 if (!get_config('block_search', 'allow_no_access')) {
@@ -46,7 +47,12 @@ if ($courseID) {
 }
 
 $PAGE->requires->jquery();
-$PAGE->set_url('/blocks/search');
+$PAGE->set_url('/blocks/search', array(
+	'q' => $q,
+	'courseID' => $courseID,
+	'page' => $pageNum,
+	'showHiddenResults' => $showHiddenResults
+));
 $PAGE->requires->css('/blocks/search/assets/css/page.css');
 
 /**
@@ -69,7 +75,6 @@ $PAGE->set_heading(get_string('pagetitle', $searchBlock->blockName));
 echo $OUTPUT->header();
 echo html_writer::start_tag('div', array('id' => $searchBlock->blockName));
 
-
 echo $searchBlock->display->showSearchBox($q, $courseID, $showHiddenResults);
 
 if (!empty($q)) {
@@ -77,11 +82,9 @@ if (!empty($q)) {
 	$removeHiddenResults = empty($showHiddenResults) ? true : false;
 
 	//Do the search
-	$search = new MoodleSearch\Search($q, $courseID);
-	$search->filterResults($removeHiddenResults);
-	$results = $search->getResults();
+	$results = $searchBlock->search($q, $courseID, $removeHiddenResults);
 
-	if (count($results['tables']) < 1) {
+	if ($results['total'] < 1) {
 
 		//There were no results
 		$icon = html_writer::tag('i', '', array('class' => 'icon-info-sign'));
@@ -105,7 +108,7 @@ if (!empty($q)) {
 		 * Results menu (on the left)
 		 */
 		echo html_writer::start_tag('div', array('class' => 'col left'));
-			echo $searchBlock->display->showResultsNav($results);
+			echo $searchBlock->display->showResultsNav($results, $pageNum);
 
 			// This is here so the leftcol still has content (and doesn't collapse)
 			// when the resultsNav becomes position:fixed when scrolling
@@ -117,7 +120,18 @@ if (!empty($q)) {
 		 * Show results
 		 */
 		echo html_writer::start_tag('div', array('id' => 'results', 'class' => 'col right'));
-			echo $searchBlock->display->showResults($results['tables']);
+
+			/*
+			 * Results pagination
+			 */
+			$perPage = (int)get_config('block_search', 'results_per_page');
+			$pagingbar = new paging_bar($results['total'], $pageNum, $perPage, $PAGE->url);
+
+			echo $OUTPUT->render($pagingbar);
+
+			echo $searchBlock->display->showResults($results['results'], $pageNum);
+
+			echo $OUTPUT->render($pagingbar);
 
 			/*
 			 * Advanced Search Options
@@ -136,19 +150,31 @@ echo html_writer::tag('div', '', array('class' => 'clear'));
  */
 if (!empty($results)) {
 	echo '<div class="searchInfo">';
-	echo get_string('search_took', 'block_search', $results['searchTime']);
-	if (!empty($results['cached'])) {
+	
+	if (!empty($results['userCached'])) {
 		echo '<br/>';
-		echo get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
+		echo get_string('user_cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
+
+	} else {
+
+		echo get_string('search_took', 'block_search', $results['searchTime']);
+		if (!empty($results['cached'])) {
+			echo '<br/>';
+			echo get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
+		}
+		
+		if (!empty($results['filterTime'])) {
+			echo '<br/>';
+			echo get_string('filtering_took', 'block_search', $results['filterTime']);
+		}
+
 	}
-	if (!empty($results['filterTime'])) {
-		echo '<br/>';
-		echo get_string('filtering_took', 'block_search', $results['filterTime']);
-	}
+
 	if (!empty($searchBlock->display->displayTime)) {
 		echo '<br/>';
 		echo get_string('displaying_took', 'block_search', $searchBlock->display->displayTime);
 	}
+
 	echo '</div>';
 }
 

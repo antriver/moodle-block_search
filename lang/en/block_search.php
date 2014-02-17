@@ -51,6 +51,7 @@ $string['folder_contents'] = 'Files Inside Folders';
 $string['search_took'] = 'Search took <strong>{$a}</strong> seconds.';
 $string['cached_results_generated'] = 'Cached results from <strong>{$a}</strong>.';
 $string['filtering_took'] = 'Filtering results took <strong>{$a}</strong> seconds.';
+$string['user_cached_results_generated'] = 'Personalised cached results from <strong>{$a}</strong>.';
 $string['displaying_took'] = 'Displaying results took <strong>{$a}</strong> seconds.';
 
 //Admin settings
@@ -58,13 +59,19 @@ $string['settings_search_tables_name'] = 'Search Tables';
 $string['settings_search_tables_desc'] = 'Which tables in the database will be searched.';
 $string['selectall'] = 'Select All';
 $string['settings_cache_results_name'] = 'Cache Results For';
-$string['settings_cache_results_desc'] = 'How long (in seconds) to cache search results for. 0 mean no caching. Default is 1 day.';
+$string['settings_cache_results_desc'] = 'How long (in seconds) to cache search results for. 0 mean no caching. Default is 1 day. This cache stores the results from the database, before they are personalised for a certain user (results the user doesn\'t have access to are removed). Meaning this cache can be shared between different users and provides benefit when different users are searching for the same terms.';
+
+$string['settings_cache_results_per_user_name'] = 'Cache User-Specific Results For';
+$string['settings_cache_results_per_user_desc'] = 'How long (in seconds) to cache filtered results for. 0 means no caching. Default is 15 minutes. This cache stores the results from the database, AFTER results the user doesn\'t have access to are removed. Meaning this cache is specific to a single user, so it only provides a benefit when a specific user searches for the same thing again (or goes to a different page in the results). It is reccomended to have this enabled for at least a few minutes. If it is disabled, the entire search must be run again when a user goes to another page of the results. If you think your users will search for the same thing often, consider increasing this value.';
+
 $string['settings_log_searches_name'] = 'Log Searches';
 $string['settings_log_searches_desc'] = 'Should searches made be logged in the Moodle logs?';
 $string['settings_allow_no_access_name'] = 'Show Hidden Results';
 $string['settings_allow_no_access_desc'] = 'Allow users to tick "'. $string['include_hidden_results'] .'" to see results that aren\'t available to them. (This does not allow them to access the actual content that is found. But the user can see that it exists.)';
 $string['settings_search_files_in_folders_name'] = 'Search For Files Inside Folder Activities';
 $string['settings_search_files_in_folders_desc'] = 'Should searches try to find files within "folder" activities/resources in courses?';
+$string['settings_results_per_page_name'] = 'Results Per Page';
+$string['settings_results_per_page_desc'] = 'How many search results to show per page';
 
 //Capabilities
 $string['search:search'] = 'Perform a search';

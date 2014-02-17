@@ -76,7 +76,7 @@ class block_search extends block_base
 	//Can multiple instance of this block be added to the same page?
 	public function instance_allow_multiple()
 	{
-		return false;
+		return true;
 	}
 
 	//Do we have a settings.php file? (Global admin settings for the block)

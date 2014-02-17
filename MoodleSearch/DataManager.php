@@ -239,7 +239,8 @@ class DataManager
 			return self::$cache;
 		}
 
-		self::$cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'block_search', 'cache');
+		self::$cache = \cache::make('block_search', 'main');
+		#self::$cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'block_search', 'cache');
 
 		return self::$cache;
 	}

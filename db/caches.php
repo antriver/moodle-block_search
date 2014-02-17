@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,14 +15,17 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Search block version info
+ * Cache definitions for search block
  * @package	   block_search
  * @copyright	 Anthony Kuske <www.anthonykuske.com>
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2014021704; // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires = 2012112900; // Requires this Moodle version
-$plugin->component = 'block_search'; // Full name of the plugin (used for diagnostics)
+$definitions = array(
+	'main' => array(
+	    'mode' => cache_store::MODE_APPLICATION,
+	),
+	'user_searches' => array(
+		'mode' => cache_store::MODE_SESSION,
+	)
+);

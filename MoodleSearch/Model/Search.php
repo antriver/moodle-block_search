@@ -27,21 +27,23 @@ namespace MoodleSearch;
 
 class Search
 {
-	private $q = false;
-	private $results = null;
-	private $courseID = false;
-	private $tables = false;
+	private $q = false; //The search query
+	private $results = null; //Search results
+	private $courseID = false; //CourseID to search in
+	private $userID = false; //UserID that performed the search
+	private $tables = false; //Tabls to search in
 	private $refreshCache = false;
 
-	public function __construct($q, $courseID = false)
+	public function __construct($q, $courseID = false, $userID = false)
 	{
 		$this->q = $q;
 		$this->courseID = $courseID;
-		$this->results = $this->runSearch();
 
 		if (isset($_GET['refresh'])) {
 			$this->refreshCache = true;
 		}
+
+		$this->results = $this->runSearch();
 	}
 
 	public function getResults()
@@ -119,6 +121,14 @@ class Search
 			}
 		}
 
+		//Search in folder files?
+		if (get_config('block_search', 'search_files_in_folders')) {
+			$fieldsToSearch['folder_files'] = array();
+		}
+
+		//Sort by by table name
+		ksort($fieldsToSearch);
+
 		return $fieldsToSearch;
 	}
 
@@ -130,17 +140,12 @@ class Search
 			throw new \Exception('No query was given.');
 		}
 
-		$this->tables = $this->getFieldsToSearch();
-
-		if (empty($this->tables)) {
-			throw new \Exception('Trying to search, but no tables have been specified to search in.');
-		}
-
 		$startTime = DataManager::getDebugTime();
 
+		//Check if cached shared results exist
 		$cache_for = get_config('block_search', 'cache_results');
 		$cache = $cache_for > 0 ? true : false;
-$cache = false;
+
 		if ($cache) {
 
 			$hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
@@ -159,88 +164,43 @@ $cache = false;
 					}
 				}
 			}
-
 		}
 
-		global $DB;
+		//Set the tables to search in
+		$this->tables = $this->getFieldsToSearch();
+		if (empty($this->tables)) {
+			throw new \Exception('Trying to search, but no tables have been specified to search in.');
+		}
 
+		//The results array to be returned
 		$results = array(
-			'tables' => array(),
-			'generated' => time(),
-			'searchTime' => 0,
-			'cached' => false,
-			'total' => 0
+			'tables' => array(), //Number of results from each table, and the index that they start and end
+			'results' => array(), //Array of results
+			'generated' => time(), //Time the search was made
+			'searchTime' => 0, //How long the search took
+			'cached' => false, //Are the results cached?
+			'total' => 0, //Total number of results
+			'filtered' => false, //Have the results been personalised for a user yet?
 		);
 
 		//Search each table we're supposed to search in
-		foreach ($this->tables as $table => $fields) {
-			$where = '';
+		foreach ($this->tables as $tableName => $fields) {
 
-			//Array of query values
-			$queryParameters = array();
-
-			//Build the SQL query
-			foreach ($fields as $fieldName) {
-				$where .= $this->buildWordQuery($fieldName, $this->q, $queryParameters) . ' OR ';
-			}
-			$where = rtrim($where, 'OR ');
-
-			if ($this->courseID) {
-				$where = "({$where})";
-				$where .= ' AND course = ?';
-				$queryParameters[] = $this->courseID;
+			if ($tableName == 'folder_files') {
+				$rows = $this->searchFolderFiles();
+			} else {
+				$rows = $this->searchTable($tableName, $fields);
 			}
 
-			//Full query
-			$sql = 'SELECT * FROM {' . $table . '} WHERE ' . $where;
-
-			//Run the query and return the matched rows
-			if ($tableResults = $DB->get_records_sql($sql, $queryParameters)) {
-				$results['tables'][$table] = $tableResults;
+			if (!empty($rows)) {
+				//Add the rows to the results ($results['results']) is a reference)
+				$this->convertRowsToResultObjectsAndAddToArray($tableName, $rows, $results['results']);
 			}
 		}
 
-		//Also search files in folders
-		if (get_config('block_search', 'search_files_in_folders')) {
-			$results['tables']['folder_files'] = $this->searchFolderFiles();
-		}
+		$this->addTableInfoToResults($results);
 
-		if (count($results['tables']) < 1) {
-			DataManager::getCache()->set($hash, $results);
-			$results['searchTime'] = DataManager::debugTimeTaken($startTime);
-			return $results;
-		}
-
-		//Convert the rows from the database into Result objects
-		foreach ($results['tables'] as $tableName => &$tableResults) {
-			switch ($tableName) {
-				case 'course':
-					$className = 'CourseResult';
-					break;
-
-				case 'course_categories':
-					$className = 'CategoryResult';
-					break;
-
-				case 'folder_files':
-					$className = 'FileInFolderResult';
-					break;
-
-				default:
-					$className = 'ModuleResult';
-					break;
-			}
-			$className = '\MoodleSearch\\' . $className;
-
-			foreach ($tableResults as &$row) {
-				$row = new $className($tableName, $row);
-				++$results['total'];
-			}
-		}
-
-		//Sort results by table name
-		ksort($results['tables']);
-
+		//Save in the cache
 		if ($cache) {
 			DataManager::getCache()->set($hash, $results);
 		}
@@ -248,6 +208,63 @@ $cache = false;
 		$results['searchTime'] = DataManager::debugTimeTaken($startTime);
 
 		return $results;
+	}
+
+	private function searchTable($tableName, $fields)
+	{
+		global $DB;
+
+		$where = '';
+
+		//Array of query values
+		$queryParameters = array();
+
+		//Build the SQL query
+		foreach ($fields as $fieldName) {
+			$where .= $this->buildWordQuery($fieldName, $this->q, $queryParameters) . ' OR ';
+		}
+		$where = rtrim($where, 'OR ');
+
+		if ($this->courseID) {
+			$where = "({$where})";
+			$where .= ' AND course = ?';
+			$queryParameters[] = $this->courseID;
+		}
+
+		//Full query
+		$sql = 'SELECT * FROM {' . $tableName . '} WHERE ' . $where;
+
+		//Run the query and return the matched rows
+		return $DB->get_records_sql($sql, $queryParameters);
+	}
+
+	/**
+	 * Create the appropriate Result object, given a row from a table
+	 */
+	private function convertRowsToResultObjectsAndAddToArray($tableName, $rows, &$results)
+	{
+		switch ($tableName) {
+			case 'course':
+				$className = 'CourseResult';
+				break;
+
+			case 'course_categories':
+				$className = 'CategoryResult';
+				break;
+
+			case 'folder_files':
+				$className = 'FileInFolderResult';
+				break;
+
+			default:
+				$className = 'ModuleResult';
+				break;
+		}
+		$className = '\MoodleSearch\\' . $className;
+
+		foreach ($rows as $row) {
+			$results[] = new $className($tableName, $row);
+		}
 	}
 
 
@@ -364,7 +381,37 @@ WHERE ';
 		return $where;
 	}
 
+	private function addTableInfoToResults(&$results)
+	{
+		//Total number of results
+		$results['total'] = count($results['results']);
+		$results['tables'] = array();
+		$currentTable = false;
 
+		$perPage = (int)get_config('block_search', 'results_per_page');
+		$i = 0;
+		foreach ($results['results'] as $result) {
+			if ($currentTable === false || $result->tableName != $currentTable) {
+				$results['tables'][$result->tableName] = array(
+					'count' => 0,
+					'visibleCount' => 0,
+					'hiddenCount' => 0,
+					'startIndex' => $i,
+					'startPage' => floor($i / $perPage),
+				);
+				$currentTable = $result->tableName;
+			}
+
+			++$results['tables'][$result->tableName]['count'];
+			if ($result->hidden) {
+				++$results['tables'][$result->tableName]['hiddenCount'];
+			} else {
+				++$results['tables'][$result->tableName]['visibleCount'];
+			}
+			$results['tables'][$result->tableName]['endIndex'] = $i;
+			++$i;
+		}
+	}
 
 	/**
 	* Go through the array of results and remove those the user doesn't have permission to see
@@ -376,51 +423,33 @@ WHERE ';
 			return;
 		}
 
+		$this->results['filtered'] = time();
+
 		$startTime = DataManager::getDebugTime();
 
 		//Check if each result is visible
-		foreach ($this->results['tables'] as $tableName => &$tableResults) {
-			foreach ($tableResults as $i => &$result) {
-
-				$visible = $result->isVisible();
-				if ($visible !== true) {
-					if ($removeHiddenResults) {
-						unset($tableResults[$i]);
-					} else {
-						$tableResults[$i]->hiddenReason = $visible;
-						$tableResults[$i]->hidden = true;
-					}
+		foreach ($this->results['results'] as $i => &$result) {
+			$visible = $result->isVisible();
+			if ($visible !== true) {
+				if ($removeHiddenResults) {
+					unset($this->results['results'][$i]);
+				} else {
+					$result->hiddenReason = $visible;
+					$result->hidden = true;
 				}
 			}
 		}
 
+		//Unset hanging references
 		unset($result);
-		unset($tableResults);
 
-		if ($removeHiddenResults) {
+		$this->addTableInfoToResults($this->results);
 
-			$this->results['total'] = 0;
-
-			//Now remove tables that have no results left
-			foreach ($this->results['tables'] as $tableName => $tableResults) {
-				$c = count($tableResults);
-				if ($c < 1) {
-					unset($this->results['tables'][$tableName]);
-				} else {
-					$this->results['total'] += $c;
-				}
-			}
-
-		} else {
-
-			//Hidden results are included, but we want them to go to the bottom
-			//Sort each table's results by 'hidden'
-			foreach ($this->results['tables'] as $tableName => &$tableResults) {
-				usort($tableResults, function ($a, $b) {
-					return $a->hidden - $b->hidden;
-				});
-			}
-
+		if (!$removeHiddenResults) {
+			// Hidden results are included, but we want them to go to the bottom
+			// Sort the results by 'tableName' then by 'hidden'
+			require_once(dirname(__DIR__) . '/sort_array_multidim.php');
+			$this->results['results'] = sort_array_multidim($this->results['results'], "tableName ASC, hidden ASC");
 		}
 
 		$this->results['filterTime'] = DataManager::debugTimeTaken($startTime);

@@ -7,6 +7,7 @@ class FileInFolderResult extends Result
 	public function icon()
 	{
 		global $OUTPUT;
+		#return '';
 		return $OUTPUT->pix_icon(file_mimetype_icon($this->row->mimetype), '');
 	}
 
@@ -68,8 +69,6 @@ class FileInFolderResult extends Result
 	public function isVisible()
 	{
 		global $USER;
-
-#return true;
 
 		if (!$this->row->modulevisible) {
 			return false;

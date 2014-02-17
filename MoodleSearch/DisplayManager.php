@@ -153,7 +153,7 @@ class DisplayManager
 
 
 	//Shows the 'quick jump' box on the left of the results page
-	public function showResultsNav($results)
+	public function showResultsNav($results, $currentPage)
 	{
 		$r = \html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 
@@ -164,18 +164,31 @@ class DisplayManager
 		$r .= \html_writer::start_tag('div', array('class' => 'content'));
 		$r .= \html_writer::start_tag('ul');
 
-		foreach ($results['tables'] as $tableName => $tableResults) {
-			if (count($tableResults) < 1) {
+		foreach ($results['tables'] as $tableName => $tableInfo) {
+			if ($tableInfo['count'] < 1) {
 				continue;
 			}
 			$sectionDetails = $this->tableName($tableName);
 
-			$countLabel = \html_writer::tag('span', count($tableResults));
+			if ($tableInfo['hiddenCount'] > 0) {
+				$countLabel = \html_writer::tag('span', $tableInfo['visibleCount'] . ' + ' . $tableInfo['count'] . ' hidden');
+			} else {
+				$countLabel = \html_writer::tag('span', $tableInfo['visibleCount']);
+			}
+
+			if ($tableInfo['startPage'] == $currentPage) {
+				$href = "#searchresults-{$tableName}";
+			} else {
+				global $PAGE;
+				$url = clone ($PAGE->url);
+				$url->param('page', $tableInfo['startPage']);
+				$href = $url->out(false) . "#searchresults-{$tableName}";
+			}
 
 			$a = \html_writer::tag(
 				'a',
 				$countLabel . $sectionDetails['icon'] . ' ' . $sectionDetails['title'],
-				array('href' => "#searchresults-{$tableName}")
+				array('href' => $href)
 			);
 
 			$r .= \html_writer::tag('li', $a);
@@ -188,33 +201,51 @@ class DisplayManager
 		return $r;
 	}
 
+	public function sliceResultsForPage($results, $pageNum)
+	{
+		$perPage = (int)get_config('block_search', 'results_per_page');
+		$offset = $pageNum * $perPage;
+		return array_splice($results, $offset, $perPage);
+	}
+
 	//Takes the result set from a search and makes HTML to show it nicely
-	public function showResults($results)
+	public function showResults($results, $pageNum = 0, $currentTable = false)
 	{
 		$startTime = DataManager::getDebugTime();
 
+		$results = $this->sliceResultsForPage($results, $pageNum);
+
 		$r = '';
 
-		foreach ($results as $tableName => $tableResults) {
-			if (count($tableResults) < 1) {
-				continue;
-			}
-			$sectionDetails = $this->tableName($tableName);
+		foreach ($results as $result) {
 
-			//Section header in results
-			$r .= \html_writer::tag(
-				'h3',
-				$sectionDetails['icon'] . ' ' . $sectionDetails['title'],
-				array('id' => 'searchresults-' . $tableName)
-			);
+			if ($currentTable === false || $result->tableName != $currentTable) {
 
-			//Show results from this table
-			$r .= \html_writer::start_tag('ul', array('class' => 'results'));
-			foreach ($tableResults as $result) {
-				$r .= $this->showResult($tableName, $result, $sectionDetails['icon']);
+				//Start of a new section in results
+
+				if ($currentTable !== false) {
+					//Close the previous section
+					$r .= \html_writer::end_tag('ul');
+				}
+
+				//Section header in results
+				$sectionDetails = $this->tableName($result->tableName);
+				$r .= \html_writer::tag(
+					'h3',
+					$sectionDetails['icon'] . ' ' . $sectionDetails['title'],
+					array('id' => 'searchresults-' . $result->tableName)
+				);
+
+				//Show results from this table
+				$r .= \html_writer::start_tag('ul', array('class' => 'results'));
+
+				$currentTable = $result->tableName;
 			}
-			$r .= \html_writer::end_tag('ul');
+
+			$r .= $this->showResult($result->tableName, $result, $sectionDetails['icon']);
 		}
+
+		$r .= \html_writer::end_tag('ul');
 
 		$this->displayTime = DataManager::debugTimeTaken($startTime);
 
