@@ -36,6 +36,8 @@ $courseID = optional_param('courseID', 0, PARAM_INT);
 $pageNum = optional_param('page', 0, PARAM_INT);
 $showHiddenResults = optional_param('showHiddenResults', false, PARAM_BOOL);
 
+$perPage = (int)get_config('block_search', 'results_per_page');
+
 if (!get_config('block_search', 'allow_no_access')) {
 	$showHiddenResults = false;
 }
@@ -102,6 +104,17 @@ if (!empty($q)) {
 	} else {
 
 		$icon = html_writer::tag('i', '', array('class' => 'icon-list-ul'));
+
+		$offset = $pageNum * $perPage;
+			echo '<p id="showing">'
+				. 'Showing ' 
+				. number_format($offset + 1)
+				. ' to '
+				. number_format(min(($offset + $perPage), $results['total']))
+				. ' of '
+				. number_format($results['total'])
+				. ' results</span></p>';
+
 		echo html_writer::tag('h2', $icon . ' ' . get_string('search_results', 'block_search'));
 
 		/*
@@ -124,7 +137,6 @@ if (!empty($q)) {
 			/*
 			 * Results pagination
 			 */
-			$perPage = (int)get_config('block_search', 'results_per_page');
 			$pagingbar = new paging_bar($results['total'], $pageNum, $perPage, $PAGE->url);
 
 			echo $OUTPUT->render($pagingbar);

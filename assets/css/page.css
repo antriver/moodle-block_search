@@ -1,7 +1,6 @@
 /* Styles used when displaying the full search page / search results (/blocks/search/index.php) */
 
 #block_search > h2 {
-	color:#1662A3;
 	padding-bottom:15px;
 	border-bottom:1px #ccc solid;
 	margin-top:30px;
@@ -14,6 +13,13 @@
 	font-weight:bold;
 	padding:15px;
 	color:#1662A3;
+}
+
+#block_search p#showing {
+	float:right;
+	margin:21px 0 0 0;
+	font-size: 12px;
+	font-weight: bold;
 }
 
 /* Search form */
