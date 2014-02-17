@@ -97,7 +97,11 @@ abstract class Result
 
 		$path = array();
 		foreach ($categoryIDs as $categoryID) {
-			$categoryIcon = course_get_category_icon($categoryID);
+			if (function_exists('\course_get_category_icon')) {
+				$categoryIcon = \course_get_category_icon($categoryID);
+			} else {
+				$categoryIcon = false;
+			}
 			$path[] = array(
 				'title' => 'Category',
 				'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryID)),

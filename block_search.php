@@ -26,8 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 class block_search extends block_base
 {
 
-	public function init()
-	{
+	public function init() {
 		if (!empty($this->page->course)) {
 			$this->title = get_string('searchverb', 'block_search') . $this->page->course->fullname;
 		} else {
@@ -35,12 +34,11 @@ class block_search extends block_base
 		}
 	}
 
-	//Set the content of the block when displayed as a block on a page
-	public function get_content()
-	{
+	// Set the content of the block when displayed as a block on a page.
+	public function get_content() {
 		global $CFG, $OUTPUT, $PAGE;
 
-		//Include the CSS for the block
+		// Include the CSS for the block.
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
 
 		require_once dirname(__FILE__) . '/MoodleSearch/Block.php';

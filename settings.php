@@ -38,6 +38,16 @@ $settings->add(
 	)
 );
 
+//Search files in folders?
+$settings->add(
+	new admin_setting_configcheckbox(
+		'block_search/search_files_in_folders',
+		get_string('settings_search_files_in_folders_name', 'block_search'),
+		get_string('settings_search_files_in_folders_desc', 'block_search'),
+		1
+	)
+);
+
 //Cache
 $settings->add(
 	new admin_setting_configtext(

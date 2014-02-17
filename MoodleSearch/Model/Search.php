@@ -75,11 +75,19 @@ class Search
 			switch ($tableName) {
 
 				case 'course':
-					//Don't show other courses if we're searching in a course
+					//Don't show other courses if we're searching within a certain in a course
 					if ($this->courseID) {
 						continue;
 					}
 					$fieldsToSearch['course'] = array('fullname', 'shortname');
+					break;
+
+				case 'course_categories':
+					//Don't show other courses if we're searching in a course
+					if ($this->courseID) {
+						continue;
+					}
+					$fieldsToSearch['course_categories'] = array('name', 'description');
 					break;
 
 				default:
@@ -193,8 +201,9 @@ $cache = false;
 		}
 
 		//Also search files in folders
-		//TODO: This isn't ready yet
-		//$results['tables']['filesInFolders'] = $this->searchFilesInFolders();
+		if (get_config('block_search', 'search_files_in_folders')) {
+			$results['tables']['folder_files'] = $this->searchFolderFiles();
+		}
 
 		if (count($results['tables']) < 1) {
 			DataManager::getCache()->set($hash, $results);
@@ -213,7 +222,7 @@ $cache = false;
 					$className = 'CategoryResult';
 					break;
 
-				case 'filesInFolders':
+				case 'folder_files':
 					$className = 'FileInFolderResult';
 					break;
 
@@ -228,6 +237,9 @@ $cache = false;
 				++$results['total'];
 			}
 		}
+
+		//Sort results by table name
+		ksort($results['tables']);
 
 		if ($cache) {
 			DataManager::getCache()->set($hash, $results);
@@ -244,7 +256,7 @@ $cache = false;
 	 * This is a bit more complicated than a simple search, hence the separate method
 	 * @return [type] [description]
 	 */
-	private function searchFilesInFolders()
+	private function searchFolderFiles()
 	{
 		global $DB;
 

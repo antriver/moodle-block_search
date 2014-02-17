@@ -253,6 +253,9 @@ class DataManager
 		//Courses table
 		$tables['course'] = 'course (fullname, shortname)';
 
+		//Category table
+		$tables['course_categories'] = 'course_categories (name, description)';
+
 		//Database manager object
 		$dbman = $DB->get_manager();
 

@@ -63,7 +63,8 @@ $string['settings_log_searches_name'] = 'Log Searches';
 $string['settings_log_searches_desc'] = 'Should searches made be logged in the Moodle logs?';
 $string['settings_allow_no_access_name'] = 'Show Hidden Results';
 $string['settings_allow_no_access_desc'] = 'Allow users to tick "'. $string['include_hidden_results'] .'" to see results that aren\'t available to them. (This does not allow them to access the actual content that is found. But the user can see that it exists.)';
-
+$string['settings_search_files_in_folders_name'] = 'Search For Files Inside Folder Activities';
+$string['settings_search_files_in_folders_desc'] = 'Should searches try to find files within "folder" activities/resources in courses?';
 
 //Capabilities
 $string['search:search'] = 'Perform a search';

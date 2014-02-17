@@ -240,7 +240,7 @@ class DisplayManager
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-archive'))
 				);
 				break;
-			case 'filesInFolders':
+			case 'folder_files':
 				return array(
 					'title' => get_string('folder_contents', 'block_search'),
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-close'))
