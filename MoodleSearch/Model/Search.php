@@ -33,6 +33,7 @@ class Search
 	private $userID = false; //UserID that performed the search
 	private $tables = false; //Tabls to search in
 	private $refreshCache = false;
+	private $textSubstitutions = null;
 
 	public function __construct($q, $courseID = false, $userID = false)
 	{
@@ -311,8 +312,6 @@ WHERE ';
 		return $fileResults;
 	}
 
-
-
 	/**
 	 * Splits the query string into words and phrases as appropriate and returns
 	 * a portion of to match the given column name against.
@@ -365,13 +364,23 @@ WHERE ';
 		$queryWords = '';
 		$searchTerms = trim($searchTerms);
 		$searchWords = explode(' ', trim($searchTerms));
+
+		$searchWords = array_unique($searchWords);
+
 		foreach ($searchWords as $word) {
 			if (empty($word)) {
 				continue;
 			}
 
-			$queryWords .= "{$columnName} LIKE ? AND ";
+			$queryWords .= "({$columnName} LIKE ?";
 			$queryParameters[] = '%' . $word . '%';
+
+			foreach ($this->getTextSubstitutions($word) as $sub) {
+				$queryWords .= " OR {$columnName} LIKE ?";
+				$queryParameters[] = '%' . $sub . '%';
+			}
+
+			$queryWords .= ') AND ';
 		}
 
 		//Now stick it together
@@ -453,5 +462,27 @@ WHERE ';
 		}
 
 		$this->results['filterTime'] = DataManager::debugTimeTaken($startTime);
+	}
+
+	private function getTextSubstitutions($word)
+	{
+		//Load the config
+		if (is_null($this->textSubstitutions)) {
+			$config = get_config('block_search', 'text_substitutions');
+			$config = explode("\n", $config);
+			$this->textSubstitutions = array();
+			foreach ($config as $line) {
+				$line = strtolower($line);
+				$line = trim($line, " \r\n");
+				list($find, $replace) = explode(' => ', $line);
+				$this->textSubstitutions[$find][] = $replace;
+			}
+		}
+
+		if (isset($this->textSubstitutions[$word])) {
+			return $this->textSubstitutions[$word];
+		} else {
+			return array();
+		}
 	}
 }

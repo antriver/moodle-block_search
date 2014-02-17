@@ -72,6 +72,11 @@ $string['settings_search_files_in_folders_name'] = 'Search For Files Inside Fold
 $string['settings_search_files_in_folders_desc'] = 'Should searches try to find files within "folder" activities/resources in courses?';
 $string['settings_results_per_page_name'] = 'Results Per Page';
 $string['settings_results_per_page_desc'] = 'How many search results to show per page';
+$string['settings_text_substitutions_name'] = 'Text Substitutions';
+$string['settings_text_substitutions_desc'] = 'Text substitutions allow users to search for shortened words/phrases but still get results that contain the full phrase. For example, a user can search for "Docs" and  get results which contain "Documents". Specify each replacement on a new line in this format:
+<pre>Docs => Documents
+App => Application
+Some Phrase => Some Much Longer Phrase</pre>';
 
 //Capabilities
 $string['search:search'] = 'Perform a search';

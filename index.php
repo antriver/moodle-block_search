@@ -162,7 +162,6 @@ if (!empty($q)) {
 	 */
 	echo $searchBlock->display->showAdvancedOptions();
 
-
 }
 
 

@@ -99,3 +99,12 @@ $settings->add(
 		1
 	)
 );
+
+//Text replacements
+$settings->add(
+	new admin_setting_configtextarea(
+		'block_search/text_substitutions',
+		get_string('settings_text_substitutions_name', 'block_search'),
+		get_string('settings_text_substitutions_desc', 'block_search')
+	)
+);
