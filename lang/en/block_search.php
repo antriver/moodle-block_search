@@ -59,10 +59,10 @@ $string['settings_search_tables_name'] = 'Search Tables';
 $string['settings_search_tables_desc'] = 'Which tables in the database will be searched.';
 $string['selectall'] = 'Select All';
 $string['settings_cache_results_name'] = 'Cache Results For';
-$string['settings_cache_results_desc'] = 'How long (in seconds) to cache search results for. 0 mean no caching. Default is 1 day. This cache stores the results from the database, before they are personalised for a certain user (results the user doesn\'t have access to are removed). Meaning this cache can be shared between different users and provides benefit when different users are searching for the same terms.';
+$string['settings_cache_results_desc'] = 'How long (in seconds) to cache search results for. 0 mean no caching. Default is 1 day. This cache stores the results from the database, before they are personalised for a certain user (before results the user doesn\'t have access to are removed). Meaning this cache can be shared between different users and provides benefit when different users are searching for the same terms. If the content on your site doesn\'t change that often you can set this value higher.';
 
 $string['settings_cache_results_per_user_name'] = 'Cache User-Specific Results For';
-$string['settings_cache_results_per_user_desc'] = 'How long (in seconds) to cache filtered results for. 0 means no caching. Default is 15 minutes. This cache stores the results from the database, AFTER results the user doesn\'t have access to are removed. Meaning this cache is specific to a single user, so it only provides a benefit when a specific user searches for the same thing again (or goes to a different page in the results). It is reccomended to have this enabled for at least a few minutes. If it is disabled, the entire search must be run again when a user goes to another page of the results. If you think your users will search for the same thing often, consider increasing this value.';
+$string['settings_cache_results_per_user_desc'] = 'How long (in seconds) to cache filtered results for. 0 means no caching. Default is 15 minutes. This cache stores the results *after* results the user doesn\'t have access to have been removed. Each item in this cache is specific to a single user, so it only provides a benefit when the same person searches for the same thing again (or when they go to a different page in the results). It is reccomended to have this enabled for at least a few minutes, so users can view all the pages of results without the results having to be regenerated on each page. If it is disabled, the entire search must be run again when a user goes to another page of the results. If you think your users will search for the same thing often, consider increasing this value.';
 
 $string['settings_log_searches_name'] = 'Log Searches';
 $string['settings_log_searches_desc'] = 'Should searches made be logged in the Moodle logs?';
@@ -73,7 +73,8 @@ $string['settings_search_files_in_folders_desc'] = 'Should searches try to find 
 $string['settings_results_per_page_name'] = 'Results Per Page';
 $string['settings_results_per_page_desc'] = 'How many search results to show per page';
 $string['settings_text_substitutions_name'] = 'Text Substitutions';
-$string['settings_text_substitutions_desc'] = 'Text substitutions allow users to search for shortened words/phrases but still get results that contain the full phrase. For example, a user can search for "Docs" and  get results which contain "Documents". Specify each replacement on a new line in this format:
+$string['settings_text_substitutions_desc'] = 'Text substitutions allow users to search for shortened words/phrases but still get results that contain the full phrase. For example, a user can search for "Docs" and  get results which contain the word "Documents" and/or "Docs".
+Specify each replacement on it\'s own line in this format:
 <pre>Docs => Documents
 App => Application
 Some Phrase => Some Much Longer Phrase</pre>';
