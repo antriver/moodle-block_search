@@ -42,6 +42,7 @@ $string['include_hidden_results'] = 'Include results I don\'t have access to';
 $string['search_results_for'] = 'Search Results for \'{$a}\'';
 $string['search_results'] = 'Search Results';
 $string['items_found'] = '{$a} Items Found';
+$string['showing'] = 'Showing {$a->start} to {$a->end} of {$a->total} results';
 $string['no_results'] = 'Sorry, there were no results for your search.';
 $string['hidden_not_enrolled'] = 'You are not enrolled in this course.';
 $string['hidden_not_available'] = 'This resource has not been made available to you.';
@@ -78,6 +79,20 @@ Specify each replacement on it\'s own line in this format:
 <pre>Docs => Documents
 App => Application
 Some Phrase => Some Much Longer Phrase</pre>';
+
+
+//Advanced Search Help
+$string['advanced_search_title'] = 'Advanced Search Options';
+$string['advanced_search_desc'] = 'Add these words to your search to refine the results.';
+
+$string['advanced_search_exclude_example'] = '-word';
+$string['advanced_search_exclude_desc'] = 'Find results that <strong>don\'t</strong> include that word.';
+
+$string['advanced_search_exact_example'] = 'words in quotes';
+$string['advanced_search_exact_desc'] = 'Find results that contain this <strong>exact phrase</strong>';
+
+$string['advanced_search_wildcard_example'] = 'w*d';
+$string['advanced_search_wildcard_desc'] = '* is a <strong>wildcard</strong>. This would match both "word" and "weird".';
 
 //Capabilities
 $string['search:search'] = 'Perform a search';

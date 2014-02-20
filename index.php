@@ -106,14 +106,17 @@ if (!empty($q)) {
 		$icon = html_writer::tag('i', '', array('class' => 'icon-list-ul'));
 
 		$offset = $pageNum * $perPage;
-			echo '<p id="showing">'
-				. 'Showing '
-				. number_format($offset + 1)
-				. ' to '
-				. number_format(min(($offset + $perPage), $results['total']))
-				. ' of '
-				. number_format($results['total'])
-				. ' results</span></p>';
+		echo '<p id="showing">';
+		echo get_string(
+			'showing',
+			'block_search',
+			array(
+				'start' => number_format($offset + 1),
+				'end' => number_format(min(($offset + $perPage), $results['total'])),
+				'total' => number_format($results['total'])
+			)
+		);
+		echo '</p>';
 
 		echo html_writer::tag('h2', $icon . ' ' . get_string('search_results', 'block_search'));
 

@@ -53,7 +53,7 @@ class DisplayManager
 		);
 
 		if ($placeholderText === null) {
-			$placeholderText = get_string('search_input_text_page', 'block_search');
+			$placeholderText = $this->str('search_input_text_page');
 		}
 
 		//Input box
@@ -72,7 +72,7 @@ class DisplayManager
 		$icon = \html_writer::tag('i', '', array('class' => 'icon-search'));
 		$r .= \html_writer::tag(
 			'button',
-			$icon . ' ' . get_string('search', 'block_search'),
+			$icon . ' ' . $this->str('search'),
 			array('class' => 'searchButton')
 		);
 
@@ -83,7 +83,7 @@ class DisplayManager
 
 			if ($showOptionsTitle) {
 				$icon = \html_writer::tag('i', '', array('class' => 'icon-cogs'));
-				$r .= '<strong>' . $icon . ' ' . get_string('search_options', 'block_search') . '</strong>';
+				$r .= '<strong>' . $icon . ' ' . $this->str('search_options') . '</strong>';
 			}
 
 			//If courseID is in the URL, show options to search this course or everywhere
@@ -95,7 +95,7 @@ class DisplayManager
 						'type' => 'radio',
 						'name' => 'courseID',
 						'value' => 0,
-					)) . get_string('search_all_of_site', 'block_search', $SITE->shortname)
+					)) . $this->str('search_all_of_site', $SITE->shortname)
 				);
 
 				$courseName = \MoodleSearch\DataManager::getCourseName($courseID);
@@ -106,7 +106,7 @@ class DisplayManager
 						'name' => 'courseID',
 						'value' => $courseID,
 						'checked' => 'checked'
-					)) . get_string('search_in_course', 'block_search', $courseName)
+					)) . $this->str('search_in_course', $courseName)
 				);
 
 			}
@@ -128,7 +128,7 @@ class DisplayManager
 
 				$r .= \html_writer::tag(
 					'label',
-					$checkbox . get_string('include_hidden_results', 'block_search')
+					$checkbox . $this->str('include_hidden_results')
 				);
 			}
 
@@ -158,7 +158,7 @@ class DisplayManager
 		$r = \html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 
 		$r .= \html_writer::start_tag('div', array('class' => 'header'));
-			$r .= \html_writer::tag('h2', get_string('items_found', 'block_search', number_format($results['total'])));
+			$r .= \html_writer::tag('h2', $this->str('items_found', number_format($results['total'])));
 		$r .= \html_writer::end_tag('div');
 
 		$r .= \html_writer::start_tag('div', array('class' => 'content'));
@@ -193,7 +193,7 @@ class DisplayManager
 
 			$a = \html_writer::tag(
 				'a',
-				$countLabel . $sectionDetails['icon'] . ' ' . $sectionDetails['title'],
+				$countLabel . $sectionDetails['icon'] . $sectionDetails['title'],
 				array('href' => $href)
 			);
 
@@ -238,7 +238,7 @@ class DisplayManager
 				$sectionDetails = $this->tableName($result->tableName);
 				$r .= \html_writer::tag(
 					'h3',
-					$sectionDetails['icon'] . ' ' . $sectionDetails['title'],
+					$sectionDetails['icon'] . $sectionDetails['title'],
 					array('id' => 'searchresults-' . $result->tableName)
 				);
 
@@ -279,7 +279,7 @@ class DisplayManager
 				break;
 			case 'folder_files':
 				return array(
-					'title' => get_string('folder_contents', 'block_search'),
+					'title' => $this->str('folder_contents'),
 					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-close'))
 				);
 				break;
@@ -315,9 +315,9 @@ class DisplayManager
 
 		if (!empty($result->hiddenReason)) {
 			if ($result->hiddenReason == 'notenrolled') {
-				$niceHiddenReason = get_string('hidden_not_enrolled', 'block_search');
+				$niceHiddenReason = $this->str('hidden_not_enrolled');
 			} elseif ($result->hiddenReason == 'notvisible') {
-				$niceHiddenReason = get_string('hidden_not_available', 'block_search');
+				$niceHiddenReason = $this->str('hidden_not_available');
 			}
 
 			$hiddenIcon = \html_writer::tag('i', '', array('class' => 'icon icon-remove'));
@@ -406,19 +406,27 @@ class DisplayManager
 	public function showAdvancedOptions()
 	{
 		$r = '<div class="advancedOptions">'
-			. '<h2><i class="icon-screenshot"></i> Advanced Search Options</h2>'
-			. '<p>Add these words to your search to refine the results.</p>'
+			. '<h2><i class="icon-screenshot"></i> '. $this->str('advanced_search_title') . '</h2>'
+			. '<p>' . $this->str('advanced_search_desc') . '</p>'
 			. '<div class="col">'
-				. '<p><em>-word</em> Find results that <strong>don\'t</strong> include that word.</p>'
-				. '<p><em>&quot;words in quotes&quot;</em> '
-				. 'Find results that contain this <strong>exact phrase</strong>.</p>'
+				. '<p><em>-'. $this->str('advanced_search_exclude_example') . '</em> ' . $this->str('advanced_search_exclude_desc') .'</p>'
+				. '<p><em>&quot;' . $this->str('advanced_search_exact_example') . '&quot;</em> '
+				. $this->str('advanced_search_exact_desc') . '</p>'
 			. '</div>'
 			. '<div class="col">'
-				. '<p><em>*ish</em> * is a <strong>wildcard</strong>. '
-				. 'This would match both "English" and "Spanish".</p>'
+				. '<p><em>'. $this->str('advanced_search_wildcard_example') . '</em> ' . $this->str('advanced_search_wildcard_desc') . '</p>'
 			. '</div>'
 			. '<div class="clear"></div>'
 		. '</div>';
 		return $r;
+	}
+
+	/**
+	 * Shortcut to get_string from the block.
+	 * (Only supports one parameter though)
+	 */
+	private function str($name, $params = false)
+	{
+		return get_string($name, 'block_search', $params);
 	}
 }
