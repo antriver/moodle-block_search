@@ -282,30 +282,41 @@ class Search
 			throw new \Exception('No query was given.');
 		}
 
-		$sql = '
-SELECT
-	files.id,
-	files.filepath,
-	files.filename,
-	files.mimetype,
-	context.instanceid as folderid,
-	context.id as contextid,
-	course_modules.id as moduleid,
-	course_modules.visible as modulevisible,
-	folder.name as foldername,
-	folder.course as courseid
-FROM
-	{files} files
-JOIN
-	{context} context ON files.contextid = context.id
-JOIN
-	{course_modules} course_modules ON course_modules.id = context.instanceid
-JOIN
-	{folder} folder ON folder.id = course_modules.instance
-WHERE ';
+		$sql = "
+		SELECT
+			files.id,
+			files.filepath,
+			files.filename,
+			files.mimetype,
+			context.instanceid as folderid,
+			context.id as contextid,
+			course_modules.id as moduleid,
+			course_modules.visible as modulevisible,
+			folder.name as foldername,
+			folder.course as courseid
+		FROM
+			{files} files
+		JOIN
+			{context} context ON files.contextid = context.id
+		JOIN
+			{course_modules} course_modules ON course_modules.id = context.instanceid
+		JOIN
+			{folder} folder ON folder.id = course_modules.instance
+		WHERE
+			files.component = 'mod_folder'
+			AND
+			files.filearea = 'content'
+			AND
+			files.filename != '.'
+			AND
+			(
+		";
 
 		$queryParameters = array();
 		$sql .= $this->buildWordQuery('files.filename', $this->q, $queryParameters);
+
+		$sql .= "
+		)";
 
 		$fileResults = $DB->get_records_sql($sql, $queryParameters);
 
