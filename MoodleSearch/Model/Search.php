@@ -466,16 +466,23 @@ WHERE ';
 
 	private function getTextSubstitutions($word)
 	{
-		//Load the config
+		//Load the substitutions if not already loaded
 		if (is_null($this->textSubstitutions)) {
-			$config = get_config('block_search', 'text_substitutions');
-			$config = explode("\n", $config);
 			$this->textSubstitutions = array();
-			foreach ($config as $line) {
-				$line = strtolower($line);
-				$line = trim($line, " \r\n");
-				list($find, $replace) = explode(' => ', $line);
-				$this->textSubstitutions[$find][] = $replace;
+
+			$config = trim(get_config('block_search', 'text_substitutions'));
+			if (strlen($config) > 0) {
+
+				//Split into lines
+				$config = explode("\n", $config);
+
+				foreach ($config as $line) {
+					$line = strtolower($line);
+					$line = trim($line, " \r\n");
+					list($find, $replace) = explode(' => ', $line);
+					$this->textSubstitutions[$find][] = $replace;
+				}
+
 			}
 		}
 

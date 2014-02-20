@@ -23,7 +23,11 @@ class ModuleResult extends Result
 
 		$path = $this->getCategoryPath($course->category);
 
-		$courseIcon = course_get_icon($course->id);
+		if (function_exists('\course_get_icon')) {
+			$courseIcon = \course_get_icon($course->id);
+		} else {
+			$courseIcon = false;
+		}
 		$path[] = array(
 			'title' => 'Course',
 			'name' => $course->fullname,
@@ -33,12 +37,14 @@ class ModuleResult extends Result
 
 		//Get all info for the course section this resource is in
 		$section = DataManager::getResourceSection($this->tableName, $this->row->id);
-		$path[] = array(
-			'title' => 'Section',
-			'name' => $section->name,
-			'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
-			'icon' => 'icon-th'
-		);
+		if ($section->name) {
+			$path[] = array(
+				'title' => 'Section',
+				'name' => $section->name,
+				'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
+				'icon' => 'icon-th'
+			);
+		}
 		return $path;
 	}
 

@@ -28,7 +28,11 @@ class FileInFolderResult extends Result
 
 		$path = $this->getCategoryPath($course->category);
 
-		$courseIcon = course_get_icon($course->id);
+		if (function_exists('\course_get_icon')) {
+			$courseIcon = \course_get_icon($course->id);
+		} else {
+			$courseIcon = false;
+		}
 		$path[] = array(
 			'title' => 'Course',
 			'name' => $course->fullname,
@@ -38,12 +42,14 @@ class FileInFolderResult extends Result
 
 		//Get all info for the course section this resource is in
 		$section = DataManager::getResoureSectionFromCourseModuleID($this->row->moduleid);
-		$path[] = array(
-			'title' => 'Section',
-			'name' => $section->name,
-			'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
-			'icon' => 'icon-th'
-		);
+		if ($section->name) {
+			$path[] = array(
+				'title' => 'Section',
+				'name' => $section->name,
+				'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
+				'icon' => 'icon-th'
+			);
+		}
 
 		$path[] = array(
 			'title' => 'Folder',
