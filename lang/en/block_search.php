@@ -85,7 +85,7 @@ Some Phrase => Some Much Longer Phrase</pre>';
 $string['advanced_search_title'] = 'Advanced Search Options';
 $string['advanced_search_desc'] = 'Add these words to your search to refine the results.';
 
-$string['advanced_search_exclude_example'] = '-word';
+$string['advanced_search_exclude_example'] = 'word';
 $string['advanced_search_exclude_desc'] = 'Find results that <strong>don\'t</strong> include that word.';
 
 $string['advanced_search_exact_example'] = 'words in quotes';

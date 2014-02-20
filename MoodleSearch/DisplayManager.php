@@ -409,7 +409,7 @@ class DisplayManager
 			. '<h2><i class="icon-screenshot"></i> '. $this->str('advanced_search_title') . '</h2>'
 			. '<p>' . $this->str('advanced_search_desc') . '</p>'
 			. '<div class="col">'
-				. '<p><em>-'. $this->str('advanced_search_exclude_example') . '</em> ' . $this->str('advanced_search_exclude_desc') .'</p>'
+				. '<p><em>'. $this->str('advanced_search_exclude_example') . '</em> ' . $this->str('advanced_search_exclude_desc') .'</p>'
 				. '<p><em>&quot;' . $this->str('advanced_search_exact_example') . '&quot;</em> '
 				. $this->str('advanced_search_exact_desc') . '</p>'
 			. '</div>'
