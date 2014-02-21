@@ -2,7 +2,7 @@ A search plugin for Moodle!
 
 About
 ==========
-Allows Moodle users to search for courses and resources.
+This allows Moodle users to search for courses and resources.
 Searches can be site-wide or in a specific course.
 Users can search from the search page (http://your.moodle.url/blocks/search), or you can add the search box as a Block to your course pages.
 
@@ -36,3 +36,14 @@ Here you can choose which tables in the database to look for results in and chan
 ![Admin options 1](http://img.ctrlv.in/img/52e0c3742584a.jpg)
 
 ![Admin options 2](http://img.ctrlv.in/img/52e0c38b04a9e.jpg)
+
+Important Note
+==========
+This is distributed with the hope that it will be helpful to others, but with no warranty or guarantee that it works  whatsoever. This should be treated as beta software and is likely to be buggy. Back up your data before isntalling, and use at your own risk! 
+Tested on Moodle 2.5.3 and 2.5.4 with Postgres and MySQL databases. Apparently it doesn't work with MS SQL databases.
+
+Credits
+==========
+Created by [Anthony Kuske](http://www.anthonykuske.com), with help from [Adam Morris](http://mistermorris.com/), at [Suzhou Singapore International School](http://www.ssis-suzhou.net)
+
+[![Donate](https://www.paypalobjects.com/en_GB/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=anthonykuske%40gmail%2ecom&lc=GB&item_name=Anthony%20Kuske&no_note=0&cn=Add%20a%20note%3a&no_shipping=1&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_LG%2egif%3aNonHosted)
