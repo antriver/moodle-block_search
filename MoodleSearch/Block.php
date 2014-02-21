@@ -54,8 +54,7 @@ class Block
 
 	public function getFullURL()
 	{
-		global $CFG;
-		return $CFG->wwwroot . $this->path;
+		return new \moodle_url($this->path);
 	}
 
 	public function search($q, $courseID = 0, $removeHiddenResults = false)

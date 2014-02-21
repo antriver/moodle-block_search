@@ -16,7 +16,7 @@ class CategoryResult extends Result
 
 	public function url()
 	{
-		return '/course/index.php?categoryid=' . $this->row->id;
+		return new \moodle_url('/course/index.php', array('categoryid' => $this->row->id));
 	}
 
 	public function path()

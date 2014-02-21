@@ -105,7 +105,7 @@ abstract class Result
 			$path[] = array(
 				'title' => 'Category',
 				'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryID)),
-				'url' => '/course/index.php?categoryid=' . $categoryID,
+				'url' => new \moodle_url('/course/index.php', array('categoryid' => $categoryID)),
 				'icon' => !empty($categoryIcon) ? 'icon-'.$categoryIcon : 'icon-folder-open'
 			);
 		}

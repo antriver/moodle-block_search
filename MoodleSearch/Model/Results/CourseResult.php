@@ -16,7 +16,7 @@ class CourseResult extends Result
 
 	public function url()
 	{
-		return '/course/view.php?id=' . $this->row->id;
+		return new \moodle_url('/course/view.php', array('id' => $this->row->id));
 	}
 
 	public function path()

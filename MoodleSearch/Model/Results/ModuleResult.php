@@ -31,7 +31,7 @@ class ModuleResult extends Result
 		$path[] = array(
 			'title' => 'Course',
 			'name' => $course->fullname,
-			'url' => '/course/view.php?id=' . $course->id,
+			'url' => new \moodle_url('/course/view.php', array('id' => $course->id)),
 			'icon' => !empty($courseIcon) ? 'icon-'.$courseIcon : 'icon-archive'
 		);
 
@@ -41,7 +41,7 @@ class ModuleResult extends Result
 			$path[] = array(
 				'title' => 'Section',
 				'name' => $section->name,
-				'url' => '/course/view.php?id=' . $course->id . '&sectionid=' . $section->id,
+				'url' => new \moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
 				'icon' => 'icon-th'
 			);
 		}
