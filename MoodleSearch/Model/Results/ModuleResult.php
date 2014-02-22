@@ -13,7 +13,7 @@ class ModuleResult extends Result
 	public function url()
 	{
 		$resourceID = DataManager::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
-		return '/mod/' . $this->tableName . '/view.php?id=' . $resourceID;
+		return new \moodle_url('/mod/' . $this->tableName . '/view.php', array('id' => $resourceID));
 	}
 
 	public function path()
