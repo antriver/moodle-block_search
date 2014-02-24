@@ -450,7 +450,12 @@ class Search
 		//Check if each result is visible
 		foreach ($this->results['results'] as $i => &$result) {
 			$visible = $result->isVisible();
-			if ($visible !== true) {
+			if ($visible === null) {
+
+				//null means it should never be displayed
+				unset($this->results['results'][$i]);
+
+			} elseif ($visible !== true) {
 				if ($removeHiddenResults) {
 					unset($this->results['results'][$i]);
 				} else {

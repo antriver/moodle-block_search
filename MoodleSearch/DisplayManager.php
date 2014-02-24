@@ -238,7 +238,7 @@ class DisplayManager
 				$sectionDetails = $this->tableName($result->tableName);
 				$r .= \html_writer::tag(
 					'h3',
-					$sectionDetails['icon'] . $sectionDetails['title'],
+					$sectionDetails['icon'] . ' ' . $sectionDetails['title'],
 					array('id' => 'searchresults-' . $result->tableName)
 				);
 

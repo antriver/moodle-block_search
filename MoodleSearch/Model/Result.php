@@ -36,25 +36,24 @@ abstract class Result
 		$this->row = $row;
 	}
 
-	//Returns the URL to take the user to when clicked
+	// Returns the URL to take the user to when clicked
 	abstract public function url();
 
-	//Returns an array with the path to this row
+	// Returns an array with the path to this row
 	// e.g. Teaching & Learning > English > English (7) > Activity Name
 	abstract public function path();
 
-	//Returns the HTML to display an icon for a result
+	// Returns the HTML to display an icon for a result
 	abstract public function icon();
 
-	//Checks if the current logged in user has access to this item
-	//Subclasses should override this. But the default here is just to make everything visible
-	//Should return either true, or the name of a language string containing an error message.
-	public function isVisible()
-	{
-		return true;
-	}
+	// Checks if the current logged in user has access to this item
+	// Should return true if it is visible
+	// The name of a language string containing an error message if not
+	// Or null if it should never be displayed to anybody (if it's broken - because the course
+	// it's in is missing for example)
+	abstract public function isVisible();
 
-	//Gives a human readable name for a result row
+	// Gives a human readable name for a result row
 	public function name()
 	{
 		return $this->row->name;
@@ -116,5 +115,43 @@ abstract class Result
 	public function getRow()
 	{
 		return $this->row;
+	}
+
+	/**
+	 * Returns true if the current user is enrolled in the given courseID
+	 * An error string if not
+	 * null if the course doesn't exist
+	 */
+	protected function isCourseVisible($courseID)
+	{
+		if (!$courseID) {
+			error_log(
+				"Found a result while searching that has no course ID" .
+				" Table: " . $this->tableName .
+				" ID in table: " . $this->row->id .
+				" CourseID: " . $courseID
+			);
+			return null;
+		}
+
+		global $USER;
+
+		$coursecontext = \context_course::instance($courseID, IGNORE_MISSING);
+		if (!$coursecontext) {
+			//If the course ID is set, but doesn't exist
+			error_log(
+				"Found a result while searching, but its course doesn't exist!" .
+				" Table: " . $this->tableName .
+				" ID in table: " . $this->row->id .
+				" CourseID: " . $courseID
+			);
+			return null;
+		}
+
+		if (is_enrolled($coursecontext, $USER)) {
+			return true;
+		} else {
+			return 'notenrolled';
+		}
 	}
 }

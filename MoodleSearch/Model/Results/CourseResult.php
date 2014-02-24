@@ -26,12 +26,6 @@ class CourseResult extends Result
 
 	public function isVisible()
 	{
-		global $USER;
-		$coursecontext = \context_course::instance($this->row->id);
-		if (is_enrolled($coursecontext, $USER)) {
-			return true;
-		} else {
-			return 'notenrolled';
-		}
+		return $this->isCourseVisible($this->row->id);
 	}
 }

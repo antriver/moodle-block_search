@@ -28,4 +28,9 @@ class CategoryResult extends Result
 			return $this->getCategoryPath($this->row->id, $this->row->path, true);
 		}
 	}
+
+	public function isVisible()
+	{
+		return true;
+	}
 }

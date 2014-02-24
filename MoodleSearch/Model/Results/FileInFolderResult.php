@@ -75,15 +75,14 @@ class FileInFolderResult extends Result
 
 	public function isVisible()
 	{
-		global $USER;
-
+		// Is it set as visible?
 		if (!$this->row->modulevisible) {
 			return false;
 		}
 
-		$coursecontext = \context_course::instance($this->row->courseid);
-		if (!is_enrolled($coursecontext, $USER)) {
-			return 'notenrolled';
+		// Is user enroled in the course the folder is in?
+		if (($error = $this->isCourseVisible($this->row->courseid)) !== true) {
+			return $error;
 		}
 
 		return true;

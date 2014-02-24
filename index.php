@@ -86,7 +86,12 @@ if (!empty($q)) {
 	//Do the search
 	$results = $searchBlock->search($q, $courseID, $removeHiddenResults);
 
-	if ($results['total'] < 1) {
+	if (!empty($results['error'])) {
+
+		//Show an error
+		echo $OUTPUT->error_text($results['error']);
+
+	} elseif ($results['total'] < 1) {
 
 		//There were no results
 		$icon = html_writer::tag('i', '', array('class' => 'icon-info-sign'));
@@ -180,13 +185,16 @@ if (!empty($results)) {
 
 	} else {
 
-		echo get_string('search_took', 'block_search', $results['searchTime']);
+		if (isset($results['searchTime'])) {
+			echo get_string('search_took', 'block_search', $results['searchTime']);
+		}
+
 		if (!empty($results['cached'])) {
 			echo '<br/>';
 			echo get_string('cached_results_generated', 'block_search', date('Y-m-d H:i:s', $results['generated']));
 		}
 
-		if (!empty($results['filterTime'])) {
+		if (isset($results['filterTime'])) {
 			echo '<br/>';
 			echo get_string('filtering_took', 'block_search', $results['filterTime']);
 		}

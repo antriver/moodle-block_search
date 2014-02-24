@@ -50,11 +50,9 @@ class ModuleResult extends Result
 
 	public function isVisible()
 	{
-		global $USER;
-
-		$coursecontext = \context_course::instance($this->row->course);
-		if (!is_enrolled($coursecontext, $USER)) {
-			return 'notenrolled';
+		// Is user enroled in the course the folder is in?
+		if (($error = $this->isCourseVisible($this->row->course)) !== true) {
+			return $error;
 		}
 
 		if (DataManager::canUserSeeModule($this->row->course, $this->tableName, $this->row->id)) {

@@ -7,7 +7,9 @@
 	margin-bottom:15px;
 }
 
+#block_search .error,
 #block_search .noResults {
+	display:block;
 	text-align:center;
 	font-size:20px;
 	font-weight:bold;

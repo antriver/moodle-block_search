@@ -59,6 +59,12 @@ class Block
 
 	public function search($q, $courseID = 0, $removeHiddenResults = false)
 	{
+		if (strlen($q) < 2) {
+			return array(
+				'error' => get_string('error_query_too_short', 'block_search', 2)
+			);
+		}
+
 		//Check if user cached results exist
 		$userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
 		$useUserCache = $userCacheValidFor > 0;

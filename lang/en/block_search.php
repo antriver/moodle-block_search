@@ -39,6 +39,7 @@ $string['search_in_course'] = 'Search in {$a}';
 $string['include_hidden_results'] = 'Include results I don\'t have access to';
 
 //Search results
+$string['error_query_too_short'] = 'Please enter a query at least {$a} characters long.';
 $string['search_results_for'] = 'Search Results for \'{$a}\'';
 $string['search_results'] = 'Search Results';
 $string['items_found'] = '{$a} Items Found';
