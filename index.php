@@ -55,7 +55,7 @@ $PAGE->set_url('/blocks/search', array(
 	'page' => $pageNum,
 	'showHiddenResults' => $showHiddenResults
 ));
-$PAGE->requires->css('/blocks/search/assets/css/page.css');
+$PAGE->requires->css('/blocks/search/assets/css/page.css?v=' . $searchBlock->version());
 
 /**
  * Page Title
@@ -100,6 +100,28 @@ if (!empty($q)) {
 			$icon . ' ' . get_string('no_results', 'block_search'),
 			array('class' => 'noResults')
 		);
+
+		if ($courseID) {
+			//If searching in a course and there are no results,
+			//suggest trying a full site search.
+
+			$fullSearchURL = clone $PAGE->url;
+			$fullSearchURL->remove_params(array('courseID'));
+
+			$icon = html_writer::tag('i', '', array('class' => 'icon-hand-right'));
+			$a = html_writer::tag(
+				'a',
+				$icon . ' ' . get_string('try_full_search', 'block_search'),
+				array(
+					'href' => $fullSearchURL
+				)
+			);
+			echo html_writer::tag(
+				'div',
+				$a,
+				array('class' => 'noResults')
+			);
+		}
 
 		/*
 		 * Advanced Search Options
@@ -214,8 +236,8 @@ echo html_writer::end_tag('div');
 /*
  * Javascript
  */
-echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.scrollTo.min.js"></script>';
-echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.localScroll.min.js"></script>';
-echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/block_search.js"></script>';
+echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.scrollTo.min.js?v=' . $searchBlock->version() . '"></script>';
+echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/jquery.localScroll.min.js?v=' . $searchBlock->version() . '"></script>';
+echo '<script src="' . $searchBlock->getFullURL() . 'assets/js/block_search.js?v=' . $searchBlock->version() . '"></script>';
 
 echo $OUTPUT->footer();

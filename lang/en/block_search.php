@@ -45,6 +45,7 @@ $string['search_results'] = 'Search Results';
 $string['items_found'] = '{$a} Items Found';
 $string['showing'] = 'Showing {$a->start} to {$a->end} of {$a->total} results';
 $string['no_results'] = 'Sorry, there were no results for your search.';
+$string['try_full_search'] = 'Did you mean to search all of the site instead of just this course?';
 $string['hidden_not_enrolled'] = 'You are not enrolled in this course.';
 $string['hidden_not_available'] = 'This resource has not been made available to you.';
 $string['folder_contents'] = 'Files Inside Folders';

@@ -98,4 +98,21 @@ class Block
 
 		return $results;
 	}
+
+	/**
+	 * Returns the version number of the plugin, from the version.php file
+	 *
+	 * As far as I can see there's no variable or constant that contains this already
+	 * so it includes the version.php file to read the version number from it.
+	 */
+	public function version()
+	{
+		if (isset($this->version)) {
+			return $this->version;
+		}
+		$plugin = new \stdClass;
+		include dirname(__DIR__) . '/version.php';
+		$this->version = $plugin->version;
+		return $this->version;
+	}
 }
