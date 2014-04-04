@@ -4,6 +4,7 @@
 	padding-bottom:15px;
 	border-bottom:1px #ccc solid;
 	margin-top:30px;
+	margin-top: 0;
 	margin-bottom:15px;
 }
 
@@ -32,6 +33,7 @@
 #block_search .searchBlockForm {
 	display: block;
 	margin:0 0 20px 0;
+	margin:0;
 	text-align:center;
 	white-space: nowrap;
 }
