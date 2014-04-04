@@ -47,7 +47,7 @@ class block_search extends block_base
 		require_once(dirname(__FILE__) . '/MoodleSearch/Block.php');
 		$searchBlock = new \MoodleSearch\Block();
 
-		$q = isset($_GET['q']) ? $_GET['q'] : false;
+		$q = isset($_GET['q']) ? $_GET['q'] : '';
 
 		$this->content = new stdClass;
 		$this->content->text = $searchBlock->display->showSearchBox(
