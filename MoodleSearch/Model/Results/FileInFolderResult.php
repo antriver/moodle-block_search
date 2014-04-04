@@ -36,7 +36,7 @@ class FileInFolderResult extends Result
 			'title' => 'Course',
 			'name' => $course->fullname,
 			'url' => new \moodle_url('/course/view.php', array('id' => $course->id)),
-			'icon' => !empty($courseIcon) ? 'icon-'.$courseIcon : 'icon-archive'
+			'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
 		);
 
 		//Get all info for the course section this resource is in
@@ -47,7 +47,7 @@ class FileInFolderResult extends Result
 				'name' => $section->name,
 				//TODO: Is sectionid used by vanilla Moodle, or was that an SSIS tweak? I forgot
 				'url' => new \moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
-				'icon' => 'icon-th'
+				'icon' => 'fa fa-th'
 			);
 		}
 
@@ -55,7 +55,7 @@ class FileInFolderResult extends Result
 			'title' => 'Folder',
 			'name' => $this->row->foldername,
 			'url' => new \moodle_url('/mod/folder/view.php', array('id' => $this->row->folderid)),
-			'icon' => 'icon-folder-close'
+			'icon' => 'fa fa-folder'
 		);
 
 		foreach (explode('/', $this->row->filepath) as $folder) {
@@ -64,7 +64,7 @@ class FileInFolderResult extends Result
 					'title' => 'Folder',
 					'name' => $folder,
 					'url' => $this->url(),
-					'icon' => 'icon-folder-close'
+					'icon' => 'fa fa-folder'
 				);
 			}
 		}

@@ -6,7 +6,7 @@ class CourseResult extends Result
 {
 	public function icon()
 	{
-		return \html_writer::tag('i', '', array('class' => 'icon-archive'));
+		return \html_writer::tag('i', '', array('class' => 'fa fa-archive'));
 	}
 
 	public function name()

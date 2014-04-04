@@ -41,6 +41,7 @@ class block_search extends block_base
 		global $CFG, $OUTPUT, $PAGE;
 
 		// Include the CSS for the block.
+		$PAGE->requires->css('/blocks/search/assets/font-awesome-4.0.3/css/font-awesome.min.css');
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
 
 		require_once(dirname(__FILE__) . '/MoodleSearch/Block.php');
