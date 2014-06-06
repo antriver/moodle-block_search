@@ -106,6 +106,10 @@ class Search
 					//We want to check if these fields exist in the table
 					$moduleFields = array('name', 'intro');
 
+					if ($tableName == 'page') {
+						$moduleFields[] = 'content';
+					}
+
 					//Check if each of these fields (columns) exists in the table
 					foreach ($moduleFields as $fieldName) {
 

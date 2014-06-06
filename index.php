@@ -55,6 +55,8 @@ $PAGE->set_url('/blocks/search', array(
 	'page' => $pageNum,
 	'showHiddenResults' => $showHiddenResults
 ));
+
+$PAGE->requires->css('/blocks/search/assets/font-awesome-4.0.3/css/font-awesome.min.css');
 $PAGE->requires->css('/blocks/search/assets/css/page.css?v=' . $searchBlock->version());
 
 /**
@@ -94,7 +96,7 @@ if (!empty($q)) {
 	} elseif ($results['total'] < 1) {
 
 		//There were no results
-		$icon = html_writer::tag('i', '', array('class' => 'icon-info-sign'));
+		$icon = html_writer::tag('i', '', array('class' => 'fa fa-info-cirlce'));
 		echo html_writer::tag(
 			'div',
 			$icon . ' ' . get_string('no_results', 'block_search'),
@@ -108,7 +110,7 @@ if (!empty($q)) {
 			$fullSearchURL = clone $PAGE->url;
 			$fullSearchURL->remove_params(array('courseID'));
 
-			$icon = html_writer::tag('i', '', array('class' => 'icon-hand-right'));
+			$icon = html_writer::tag('i', '', array('class' => 'fa fa-hand-o-right'));
 			$a = html_writer::tag(
 				'a',
 				$icon . ' ' . get_string('try_full_search', 'block_search'),
@@ -130,7 +132,7 @@ if (!empty($q)) {
 
 	} else {
 
-		$icon = html_writer::tag('i', '', array('class' => 'icon-list-ul'));
+		$icon = html_writer::tag('i', '', array('class' => 'fa fa-list-ul'));
 
 		$offset = $pageNum * $perPage;
 		echo '<p id="showing">';

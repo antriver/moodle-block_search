@@ -317,6 +317,10 @@ class DataManager
 			//We want to check if these fields exist in the table
 			$possibleFields = array('name', 'intro');
 
+			if ($tableName == 'page') {
+					$possibleFields[] = 'content';
+			}
+
 			//Check if each of these fields (columns) exists in the table
 			foreach ($possibleFields as $fieldName) {
 

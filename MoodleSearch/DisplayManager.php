@@ -69,7 +69,7 @@ class DisplayManager
 		);
 
 		//Search Button
-		$icon = \html_writer::tag('i', '', array('class' => 'icon-search'));
+		$icon = \html_writer::tag('i', '', array('class' => 'fa fa-search'));
 		$r .= \html_writer::tag(
 			'button',
 			$icon . ' ' . $this->str('search'),
@@ -78,11 +78,13 @@ class DisplayManager
 
 		if ($showOptions) {
 
+			$r .= \html_writer::start_tag('div', array('class' => 'options'));
+
 			$allowNoAccess = get_config('block_search', 'allow_no_access');
 			$showOptionsTitle = $allowNoAccess || !empty($courseID);
 
 			if ($showOptionsTitle) {
-				$icon = \html_writer::tag('i', '', array('class' => 'icon-cogs'));
+				$icon = \html_writer::tag('i', '', array('class' => 'fa fa-cogs'));
 				$r .= '<strong>' . $icon . ' ' . $this->str('search_options') . '</strong>';
 			}
 
@@ -132,6 +134,8 @@ class DisplayManager
 				);
 			}
 
+			$r .= \html_writer::end_tag('div');
+
 		} elseif ($courseID) {
 
 			//If we're not showing the options, but have a courseID we still need to add that to the form
@@ -158,7 +162,9 @@ class DisplayManager
 		$r = \html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 
 		$r .= \html_writer::start_tag('div', array('class' => 'header'));
-			$r .= \html_writer::tag('h2', $this->str('items_found', number_format($results['total'])));
+			$r .= \html_writer::start_tag('div', array('class' => 'title'));
+				$r .= \html_writer::tag('h2', $this->str('items_found', number_format($results['total'])));
+			$r .= \html_writer::end_tag('div');
 		$r .= \html_writer::end_tag('div');
 
 		$r .= \html_writer::start_tag('div', array('class' => 'content'));
@@ -268,19 +274,19 @@ class DisplayManager
 			case 'course_categories':
 				return array(
 					'title' => get_string('categories', 'moodle'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-open'))
+					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-folder-open'))
 				);
 				break;
 			case 'course':
 				return array(
 					'title' => get_string('courses', 'moodle'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'icon-archive'))
+					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-archive'))
 				);
 				break;
 			case 'folder_files':
 				return array(
 					'title' => $this->str('folder_contents'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'icon-folder-close'))
+					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-folder'))
 				);
 				break;
 			default:
@@ -292,7 +298,7 @@ class DisplayManager
 				} else {
 					return array(
 						'title' =>$tableName, //oops no localization
-						'icon' => \html_writer::tag('i', '', array('class' => 'icon-certificate'))
+						'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-certificate'))
 					);
 				}
 		}
@@ -305,7 +311,7 @@ class DisplayManager
 		$liClasses = '';
 
 		if ($result->hidden) {
-			$liClasses .= ' hidden';
+			$liClasses .= ' hideresult';
 		}
 
 		$r = \html_writer::start_tag('li', array('class' => $liClasses));
@@ -320,7 +326,7 @@ class DisplayManager
 				$niceHiddenReason = $this->str('hidden_not_available');
 			}
 
-			$hiddenIcon = \html_writer::tag('i', '', array('class' => 'icon icon-remove'));
+			$hiddenIcon = \html_writer::tag('i', '', array('class' => 'fa fa-times'));
 			$r .= \html_writer::tag(
 				'h5',
 				$hiddenIcon . ' ' .$niceHiddenReason,
@@ -406,7 +412,7 @@ class DisplayManager
 	public function showAdvancedOptions()
 	{
 		$r = '<div class="advancedOptions">'
-			. '<h2><i class="icon-screenshot"></i> '. $this->str('advanced_search_title') . '</h2>'
+			. '<h4><i class="fa fa-crosshairs"></i> '. $this->str('advanced_search_title') . '</h4>'
 			. '<p>' . $this->str('advanced_search_desc') . '</p>'
 			. '<div class="col">'
 				. '<p><em>'. $this->str('advanced_search_exclude_example') . '</em> ' . $this->str('advanced_search_exclude_desc') .'</p>'

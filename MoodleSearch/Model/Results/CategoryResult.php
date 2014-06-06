@@ -8,9 +8,9 @@ class CategoryResult extends Result
 	{
 		if (function_exists('\course_get_category_icon')) {
 			$categoryIcon = \course_get_category_icon($this->row->id);
-			return \html_writer::tag('i', '', array('class' => 'icon-' . $categoryIcon));
+			return \html_writer::tag('i', '', array('class' => 'fa fa-' . $categoryIcon));
 		} else {
-			return \html_writer::tag('i', '', array('class' => 'icon-folder-open'));
+			return \html_writer::tag('i', '', array('class' => 'fa fa-folder-open'));
 		}
 	}
 

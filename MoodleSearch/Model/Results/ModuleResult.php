@@ -32,7 +32,7 @@ class ModuleResult extends Result
 			'title' => 'Course',
 			'name' => $course->fullname,
 			'url' => new \moodle_url('/course/view.php', array('id' => $course->id)),
-			'icon' => !empty($courseIcon) ? 'icon-'.$courseIcon : 'icon-archive'
+			'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
 		);
 
 		//Get all info for the course section this resource is in
@@ -42,7 +42,7 @@ class ModuleResult extends Result
 				'title' => 'Section',
 				'name' => $section->name,
 				'url' => new \moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
-				'icon' => 'icon-th'
+				'icon' => 'fa fa-th'
 			);
 		}
 		return $path;

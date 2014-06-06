@@ -28,33 +28,33 @@ class block_search extends block_base
 
 	public function init()
 	{
-		if (!empty($this->page->course)) {
-			$this->title = get_string('searchverb', 'block_search') . $this->page->course->fullname;
-		} else {
-			$this->title = get_string('pluginname', 'block_search');
-		}
+		$this->title = get_string('pluginname', 'block_search');
 	}
 
 	// Set the content of the block when displayed as a block on a page.
 	public function get_content()
 	{
-		global $CFG, $OUTPUT, $PAGE;
+		global $CFG, $OUTPUT, $PAGE, $SITE;
 
 		// Include the CSS for the block.
+		$PAGE->requires->css('/blocks/search/assets/font-awesome-4.0.3/css/font-awesome.min.css');
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
 
 		require_once(dirname(__FILE__) . '/MoodleSearch/Block.php');
 		$searchBlock = new \MoodleSearch\Block();
 
-		$q = isset($_GET['q']) ? $_GET['q'] : false;
+		$q = isset($_GET['q']) ? $_GET['q'] : '';
+
+		$courseID = (is_object($this->page->course) && $this->page->course->id > 1) ? $this->page->course->id : false;
+		$courseName = $courseID ? $this->page->course->fullname : $SITE->shortname;
 
 		$this->content = new stdClass;
 		$this->content->text = $searchBlock->display->showSearchBox(
 			$q,
-			$this->page->course->id,
+			$courseID,
 			false,
 			false,
-			get_string('search_input_text_block', 'block_search')
+			get_string(($courseID ? 'search_in_course' : 'search_all_of_site'), 'block_search', $courseName)
 		);
 
 		return $this->content;

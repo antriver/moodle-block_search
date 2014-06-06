@@ -96,6 +96,9 @@ abstract class Result
 
 		$path = array();
 		foreach ($categoryIDs as $categoryID) {
+
+			// This is really an SSIS tweak, but if your Moodle has this function to find
+			// and icon to use for a category it should return the name of a fontawesome 4 icon here
 			if (function_exists('\course_get_category_icon')) {
 				$categoryIcon = \course_get_category_icon($categoryID);
 			} else {
@@ -105,7 +108,7 @@ abstract class Result
 				'title' => 'Category',
 				'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryID)),
 				'url' => new \moodle_url('/course/index.php', array('categoryid' => $categoryID)),
-				'icon' => !empty($categoryIcon) ? 'icon-'.$categoryIcon : 'icon-folder-open'
+				'icon' => !empty($categoryIcon) ? 'fa fa-'.$categoryIcon : 'fa fa-folder-open'
 			);
 		}
 
