@@ -167,6 +167,8 @@ class Search
 			}
 		}
 
+		raise_memory_limit(MEMORY_EXTRA);
+
 		//Set the tables to search in
 		$this->tables = $this->getFieldsToSearch();
 		if (empty($this->tables)) {

@@ -114,36 +114,73 @@ class DataManager
 
 
 
-	public static function canUserSeeModule($courseID, $module, $idInModule)
+	public static function canUserSeeModule($courseID, $moduleName, $idInModule)
 	{
 		//Current logged in user
 		global $USER;
 
 		//Get the overall coursemodule ID, from the module's ID inside the plugin
-		$cmid = self::getGlobalInstanceIDFromModuleInstanceID($module, $idInModule);
+		$cmid = self::getGlobalInstanceIDFromModuleInstanceID($moduleName, $idInModule);
+
+
+		// Create our own cm_info instance for this module
+		// because using get_fast_modinfo is horrible inefficient
+		// Begin new way...
+
+		global $DB;
+		$course = $DB->get_record('course', array('id' => $courseID));
+
+		$course_modinfo = new dummy_course_modinfo($courseID);
+
+		$courseModuleRow = $DB->get_record('course_modules', array('id' => $cmid));
+		$moduleTableRow = $DB->get_record($moduleName, array('id' => $idInModule));
+
+		$mod = (object) array_merge((array)$courseModuleRow, (array)$moduleTableRow);
+		$mod->id = $idInModule;
+		$mod->cm = $cmid;
+		$mod->mod = $moduleName;
+
+		$cm_info = new \cm_info($course_modinfo, $course, $mod, false);
+		$cm_info->obtain_dynamic_data();
+
+		if (!$cm_info->uservisible) {
+			return false;
+		}
+
+		// End new way.
+
+
+		// Begin old way...
 
 		//Load the "modinfo" for the course, and see if the module is "uservisible"
 		//This is pretty expensive and is likely the source of any slowness,
 		//because get_fast_modinfo loads info for all the modules in the course
 		//even though we only want the one
-		$modinfo = get_fast_modinfo($courseID, $USER->id);
+		/*$modinfo = get_fast_modinfo($courseID, $USER->id);
 
 		try {
-			$mod = $modinfo->get_cm($cmid);
+			$cm = $modinfo->get_cm($cmid);
+
+			print_object(memory_get_usage()/1024/1024);
+			print_object('Max: ' . memory_get_peak_usage()/1024/1024);
+			echo '<hr/>';
+
+			if (!$cm->uservisible) {
+				return false;
+			}
+
 			//Throws a moodle_exception if it's not found
 		} catch (\moodle_exception $e) {
 			return false;
-		}
+		}*/
 
-		//If the module says it's not visible, don't show it
-		if (!$mod->uservisible) {
-			return false;
-		}
+		// End old way.
+
 
 		//It still might not be right to show it, because some plugins still want to be shown
 		//but the user will just see "you don't have permission" when they click it
 		//So let's handle each plugin that's awkward and check if the user has whatever capability applies to it
-		switch ($module) {
+		switch ($moduleName) {
 
 			case 'chat':
 				$capability = 'mod/chat:chat';
@@ -312,5 +349,27 @@ class DataManager
 	public static function debugTimeTaken($startTime)
 	{
 		return round((self::getDebugTime() - $startTime), 4);
+	}
+}
+
+/**
+ * The cm_info class which is used to check if a module is available
+ * need an instance of course_modinfo passed to it.
+ * But that classe is super bloated. So we sent it one of these instead...
+ */
+class dummy_course_modinfo extends \course_modinfo
+{
+	function __construct($courseid)
+	{
+		$this->courseid = $courseid;
+		global $USER;
+		$this->userid = $USER->id;
+	}
+
+	function get_section_info($sectionnumber, $strictness = IGNORE_MISSING)
+	{
+		global $DB;
+		$row =$DB->get_record('course_sections', array('id' => $sectionnumber), '*', $strictness);
+		return new \section_info($row, $row->section, $this->courseid, 0, $this, $this->userid);
 	}
 }
