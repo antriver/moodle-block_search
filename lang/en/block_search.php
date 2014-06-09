@@ -35,7 +35,7 @@ $string['search_input_text_page'] = 'Find courses, activities, or documents';
 //Search form
 $string['search_options'] = 'Search Options:';
 $string['search_all_of_site'] = 'Search all of {$a}';
-$string['search_in_course'] = 'Search in {$a}';
+$string['search_in_course'] = 'Search in {$a} only';
 $string['include_hidden_results'] = 'Include results I don\'t have access to';
 
 //Search results

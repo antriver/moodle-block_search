@@ -322,6 +322,11 @@ class Search
 		$sql .= "
 		)";
 
+		if ($this->courseID) {
+			$sql .= ' AND course_modules.course = ?';
+			$queryParameters[] = $this->courseID;
+		}
+
 		$fileResults = $DB->get_records_sql($sql, $queryParameters);
 
 		return $fileResults;

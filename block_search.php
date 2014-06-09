@@ -54,6 +54,7 @@ class block_search extends block_base
 			$courseID,
 			false,
 			false,
+			false,
 			get_string(($courseID ? 'search_in_course' : 'search_all_of_site'), 'block_search', $courseName)
 		);
 

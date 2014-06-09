@@ -36,6 +36,7 @@ class DisplayManager
 	public function showSearchBox(
 		$q = false,
 		$courseID = false,
+		$searchInCourse = false,
 		$showAllResults = false,
 		$showOptions = true,
 		$placeholderText = null
@@ -91,24 +92,41 @@ class DisplayManager
 			//If courseID is in the URL, show options to search this course or everywhere
 			if ($courseID) {
 
+				// hidden courseID field
+				$r .= \html_writer::empty_tag('input', array(
+					'type' => 'hidden',
+					'name' => 'courseID',
+					'value' => $courseID
+				));
+
+
+				$inputParams = array(
+						'type' => 'radio',
+						'name' => 'searchInCourse',
+						'value' => 0,
+				);
+				if (!$searchInCourse) {
+					$inputParams['checked'] = 'checked';
+				}
+
 				$r .= \html_writer::tag(
 					'label',
-					\html_writer::empty_tag('input', array(
-						'type' => 'radio',
-						'name' => 'courseID',
-						'value' => 0,
-					)) . $this->str('search_all_of_site', $SITE->shortname)
+					\html_writer::empty_tag('input', $inputParams) . $this->str('search_all_of_site', $SITE->shortname)
 				);
+
+				$inputParams = array(
+						'type' => 'radio',
+						'name' => 'searchInCourse',
+						'value' => 1
+				);
+				if ($searchInCourse) {
+					$inputParams['checked'] = 'checked';
+				}
 
 				$courseName = \MoodleSearch\DataManager::getCourseName($courseID);
 				$r .= \html_writer::tag(
 					'label',
-					\html_writer::empty_tag('input', array(
-						'type' => 'radio',
-						'name' => 'courseID',
-						'value' => $courseID,
-						'checked' => 'checked'
-					)) . $this->str('search_in_course', $courseName)
+					\html_writer::empty_tag('input', $inputParams) . $this->str('search_in_course', $courseName)
 				);
 
 			}

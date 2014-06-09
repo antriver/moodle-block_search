@@ -33,6 +33,7 @@ $searchBlock = new MoodleSearch\Block();
 $q = optional_param('q', '', PARAM_RAW);
 $escapedq = htmlentities($q);
 $courseID = optional_param('courseID', 0, PARAM_INT);
+$searchInCourse = optional_param('searchInCourse', false, PARAM_BOOL);
 $pageNum = optional_param('page', 0, PARAM_INT);
 $showHiddenResults = optional_param('showHiddenResults', false, PARAM_BOOL);
 
@@ -52,6 +53,7 @@ $PAGE->requires->jquery();
 $PAGE->set_url('/blocks/search', array(
 	'q' => $q,
 	'courseID' => $courseID,
+	'searchInCourse' => $searchInCourse,
 	'page' => $pageNum,
 	'showHiddenResults' => $showHiddenResults
 ));
@@ -79,14 +81,14 @@ $PAGE->set_heading(get_string('pagetitle', $searchBlock->blockName));
 echo $OUTPUT->header();
 echo html_writer::start_tag('div', array('id' => $searchBlock->blockName));
 
-echo $searchBlock->display->showSearchBox($q, $courseID, $showHiddenResults);
+echo $searchBlock->display->showSearchBox($q, $courseID, $searchInCourse, $showHiddenResults);
 
 if (!empty($q)) {
 
 	$removeHiddenResults = empty($showHiddenResults) ? true : false;
 
 	//Do the search
-	$results = $searchBlock->search($q, $courseID, $removeHiddenResults);
+	$results = $searchBlock->search($q, ($searchInCourse ? $courseID : false), $removeHiddenResults);
 
 	if (!empty($results['error'])) {
 
@@ -108,7 +110,7 @@ if (!empty($q)) {
 			//suggest trying a full site search.
 
 			$fullSearchURL = clone $PAGE->url;
-			$fullSearchURL->remove_params(array('courseID'));
+			$fullSearchURL->remove_params(array('searchInCourse'));
 
 			$icon = html_writer::tag('i', '', array('class' => 'fa fa-hand-o-right'));
 			$a = html_writer::tag(
