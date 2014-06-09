@@ -65,6 +65,8 @@ class Block
 			);
 		}
 
+		raise_memory_limit(MEMORY_EXTRA);
+
 		//Check if user cached results exist
 		$userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
 		$useUserCache = $userCacheValidFor > 0;

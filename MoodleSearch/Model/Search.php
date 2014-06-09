@@ -37,8 +37,6 @@ class Search
 
 	public function __construct($q, $courseID = false, $userID = false)
 	{
-		raise_memory_limit(MEMORY_EXTRA);
-
 		$this->q = $q;
 		$this->courseID = $courseID;
 

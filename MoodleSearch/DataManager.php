@@ -116,12 +116,19 @@ class DataManager
 
 	public static function canUserSeeModule($courseID, $moduleName, $idInModule)
 	{
+		if (!$courseID || !$idInModule) {
+			return false;
+		}
+
 		//Current logged in user
 		global $USER;
 
 		//Get the overall coursemodule ID, from the module's ID inside the plugin
 		$cmid = self::getGlobalInstanceIDFromModuleInstanceID($moduleName, $idInModule);
 
+		if (!$cmid) {
+			return false;
+		}
 
 		// Create our own cm_info instance for this module
 		// because using get_fast_modinfo is horrible inefficient
@@ -129,11 +136,21 @@ class DataManager
 
 		global $DB;
 		$course = $DB->get_record('course', array('id' => $courseID));
+		if (!$course) {
+			return false;
+		}
 
 		$course_modinfo = new dummy_course_modinfo($courseID);
 
 		$courseModuleRow = $DB->get_record('course_modules', array('id' => $cmid));
+		if (!$courseModuleRow) {
+			return false;
+		}
+
 		$moduleTableRow = $DB->get_record($moduleName, array('id' => $idInModule));
+		if (!$moduleTableRow) {
+			return false;
+		}
 
 		$mod = (object) array_merge((array)$courseModuleRow, (array)$moduleTableRow);
 		$mod->id = $idInModule;

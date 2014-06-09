@@ -230,6 +230,9 @@ if (!empty($results)) {
 		echo get_string('displaying_took', 'block_search', $searchBlock->display->displayTime);
 	}
 
+	echo '<br/>';
+	echo 'Memory used: <strong>' . number_format(memory_get_peak_usage() / 1024 / 1024) . 'MB</strong>';
+
 	echo '</div>';
 }
 
