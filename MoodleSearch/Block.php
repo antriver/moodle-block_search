@@ -31,9 +31,6 @@ class Block
 
 	public function __construct()
 	{
-		error_reporting(E_ALL);
-		ini_set('display_errors', 1);
-
 		//TODO: Autoloader would be nice here
 		require_once __DIR__ . '/Model/Result.php';
 		require_once __DIR__ . '/Model/Results/CourseResult.php';
