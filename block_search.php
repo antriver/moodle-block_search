@@ -65,6 +65,7 @@ class block_search extends block_base
 	{
 		return array(
 			'all' => false,
+			'my' => true,
 			'site' => true,
 			'site-index' => true,
 			'course-view' => true,
