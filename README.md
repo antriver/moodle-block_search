@@ -40,7 +40,10 @@ Here you can choose which tables in the database to look for results in and chan
 Important Note
 ==========
 This is distributed with the hope that it will be helpful to others, but with no warranty or guarantee that it works  whatsoever. This should be treated as beta software and is likely to be buggy. Back up your data before isntalling, and use at your own risk! 
-Tested on Moodle 2.5.3 and 2.5.4 with Postgres and MySQL databases. Apparently it doesn't work with MS SQL databases.
+
+Test on Moodle 2.8.3+ with Postgres and MySQL databases.
+
+Apparently it doesn't work with MS SQL databases.
 
 Credits
 ==========
