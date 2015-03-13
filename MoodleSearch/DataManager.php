@@ -25,6 +25,13 @@
 
 namespace MoodleSearch;
 
+use cache;
+use cm_info;
+use context_module;
+use moodle_exception;
+use xmldb_field;
+use xmldb_table;
+
 class DataManager
 {
 	private static $cache;
@@ -140,7 +147,7 @@ class DataManager
 			return false;
 		}
 
-		$course_modinfo = new dummy_course_modinfo($courseID);
+		$course_modinfo = new DummyCourseModinfo($courseID);
 
 		$courseModuleRow = $DB->get_record('course_modules', array('id' => $cmid));
 		if (!$courseModuleRow) {
@@ -157,7 +164,7 @@ class DataManager
 		$mod->cm = $cmid;
 		$mod->mod = $moduleName;
 
-		$cm_info = new \cm_info($course_modinfo, $course, $mod, false);
+		$cm_info = new cm_info($course_modinfo, $course, $mod, false);
 		$cm_info->obtain_dynamic_data();
 
 		if (!$cm_info->uservisible) {
@@ -187,7 +194,7 @@ class DataManager
 			}
 
 			//Throws a moodle_exception if it's not found
-		} catch (\moodle_exception $e) {
+		} catch (moodle_exception $e) {
 			return false;
 		}*/
 
@@ -240,7 +247,7 @@ class DataManager
 		//If this plugin has a capability we can check
 		if (!empty($capability)) {
 			//Check if the user has the capability within the module context
-			$moduleContext = \context_module::instance($cmid);
+			$moduleContext = context_module::instance($cmid);
 			if (!has_capability($capability, $moduleContext, $USER->id)) {
 				return false;
 			}
@@ -293,8 +300,7 @@ class DataManager
 			return self::$cache;
 		}
 
-		self::$cache = \cache::make('block_search', 'main');
-		#self::$cache = \cache::make_from_params(\cache_store::MODE_APPLICATION, 'block_search', 'cache');
+		self::$cache = cache::make('block_search', 'main');
 
 		return self::$cache;
 	}
@@ -323,7 +329,7 @@ class DataManager
 			$tableFields = array();
 
 			//Create an xmldb object from the name of this table
-			$table = new \xmldb_table($tableName);
+			$table = new xmldb_table($tableName);
 
 			//Skip this module if it has no table
 			//(Only checks if a table with the same name as the module exists)
@@ -342,7 +348,7 @@ class DataManager
 			foreach ($possibleFields as $fieldName) {
 
 				//Create an xmldb object for this field's name
-				$field = new \xmldb_field($fieldName);
+				$field = new xmldb_field($fieldName);
 
 				//If this field exists in the table, we're going to search in it
 				if ($dbman->field_exists($table, $field)) {
@@ -370,27 +376,5 @@ class DataManager
 	public static function debugTimeTaken($startTime)
 	{
 		return round((self::getDebugTime() - $startTime), 4);
-	}
-}
-
-/**
- * The cm_info class which is used to check if a module is available
- * need an instance of course_modinfo passed to it.
- * But that classe is super bloated. So we sent it one of these instead...
- */
-class dummy_course_modinfo extends \course_modinfo
-{
-	function __construct($courseid)
-	{
-		$this->courseid = $courseid;
-		global $USER;
-		$this->userid = $USER->id;
-	}
-
-	function get_section_info($sectionnumber, $strictness = IGNORE_MISSING)
-	{
-		global $DB;
-		$row =$DB->get_record('course_sections', array('id' => $sectionnumber), '*', $strictness);
-		return new \section_info($row, $row->section, $this->courseid, 0, $this, $this->userid);
 	}
 }

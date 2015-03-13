@@ -1,6 +1,10 @@
 <?php
 
-namespace MoodleSearch;
+namespace MoodleSearch\Models;
+
+use html_writer;
+use moodle_url;
+use MoodleSearch\DataManager;
 
 class FileInFolderResult extends Result
 {
@@ -17,7 +21,7 @@ class FileInFolderResult extends Result
 
 	public function url()
 	{
-		return new \moodle_url('/mod/folder/view.php', array('id' => $this->row->folderid));
+		return new moodle_url('/mod/folder/view.php', array('id' => $this->row->folderid));
 	}
 
 	public function path()
@@ -35,7 +39,7 @@ class FileInFolderResult extends Result
 		$path[] = array(
 			'title' => 'Course',
 			'name' => $course->fullname,
-			'url' => new \moodle_url('/course/view.php', array('id' => $course->id)),
+			'url' => new moodle_url('/course/view.php', array('id' => $course->id)),
 			'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
 		);
 
@@ -46,7 +50,7 @@ class FileInFolderResult extends Result
 				'title' => 'Section',
 				'name' => $section->name,
 				//TODO: Is sectionid used by vanilla Moodle, or was that an SSIS tweak? I forgot
-				'url' => new \moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
+				'url' => new moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
 				'icon' => 'fa fa-th'
 			);
 		}
@@ -54,7 +58,7 @@ class FileInFolderResult extends Result
 		$path[] = array(
 			'title' => 'Folder',
 			'name' => $this->row->foldername,
-			'url' => new \moodle_url('/mod/folder/view.php', array('id' => $this->row->folderid)),
+			'url' => new moodle_url('/mod/folder/view.php', array('id' => $this->row->folderid)),
 			'icon' => 'fa fa-folder'
 		);
 

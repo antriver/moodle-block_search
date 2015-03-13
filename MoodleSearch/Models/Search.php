@@ -23,7 +23,13 @@
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace MoodleSearch;
+namespace MoodleSearch\Models;
+
+use Exception;
+use xmldb_field;
+use xmldb_table;
+use MoodleSearch\DataManager;
+use MoodleSearch\Utils;
 
 class Search
 {
@@ -50,7 +56,7 @@ class Search
 	public function getResults()
 	{
 		if ($this->results ===  null) {
-			throw new \Exception('Trying to get results before the search has been run.');
+			throw new Exception('Trying to get results before the search has been run.');
 		}
 		return $this->results;
 	}
@@ -95,7 +101,7 @@ class Search
 
 				default:
 					//Create an xmldb object from the name of this table
-					$table = new \xmldb_table($tableName);
+					$table = new xmldb_table($tableName);
 
 					//Skip this module if it has no table
 					//(Only checks if a table with the same name as the module exists)
@@ -114,7 +120,7 @@ class Search
 					foreach ($moduleFields as $fieldName) {
 
 						//Create an xmldb object for this field's name
-						$field = new \xmldb_field($fieldName);
+						$field = new xmldb_field($fieldName);
 
 						//If this field exists in the table, we're going to search in it
 						if ($dbman->field_exists($table, $field)) {
@@ -142,7 +148,7 @@ class Search
 	private function runSearch()
 	{
 		if (empty($this->q)) {
-			throw new \Exception('No query was given.');
+			throw new Exception('No query was given.');
 		}
 
 		$startTime = DataManager::getDebugTime();
@@ -174,7 +180,7 @@ class Search
 		//Set the tables to search in
 		$this->tables = $this->getFieldsToSearch();
 		if (empty($this->tables)) {
-			throw new \Exception('Trying to search, but no tables have been specified to search in.');
+			throw new Exception('Trying to search, but no tables have been specified to search in.');
 		}
 
 		//The results array to be returned
@@ -265,7 +271,7 @@ class Search
 				$className = 'ModuleResult';
 				break;
 		}
-		$className = '\MoodleSearch\\' . $className;
+		$className = '\MoodleSearch\Models\\' . $className;
 
 		foreach ($rows as $row) {
 			$results[] = new $className($tableName, $row);
@@ -283,7 +289,7 @@ class Search
 		global $DB;
 
 		if (empty($this->q)) {
-			throw new \Exception('No query was given.');
+			throw new Exception('No query was given.');
 		}
 
 		$sql = "
@@ -482,8 +488,7 @@ class Search
 		if (!$removeHiddenResults) {
 			// Hidden results are included, but we want them to go to the bottom
 			// Sort the results by 'tableName' then by 'hidden'
-			require_once(dirname(__DIR__) . '/sort_array_multidim.php');
-			$this->results['results'] = sort_array_multidim($this->results['results'], "tableName ASC, hidden ASC");
+			$this->results['results'] = Utils::sortMultidimensionalArray($this->results['results'], "tableName ASC, hidden ASC");
 		}
 
 		$this->results['filterTime'] = DataManager::debugTimeTaken($startTime);

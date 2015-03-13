@@ -23,12 +23,14 @@
 
 namespace MoodleSearch;
 
+use html_writer;
+
 class DisplayManager
 {
 	private $block;
 	public $displayTime = 0;
 
-	public function __construct(\MoodleSearch\Block $block)
+	public function __construct(Block $block)
 	{
 		$this->block = $block;
 	}
@@ -44,7 +46,7 @@ class DisplayManager
 		global $SITE;
 
 		//Begin form
-		$r = \html_writer::start_tag(
+		$r = html_writer::start_tag(
 			'form',
 			array(
 				'action' => $this->block->getFullURL(),
@@ -58,7 +60,7 @@ class DisplayManager
 		}
 
 		//Input box
-		$r .= \html_writer::empty_tag(
+		$r .= html_writer::empty_tag(
 			'input',
 			array(
 				'type' => 'text',
@@ -70,8 +72,8 @@ class DisplayManager
 		);
 
 		//Search Button
-		$icon = \html_writer::tag('i', '', array('class' => 'fa fa-search'));
-		$r .= \html_writer::tag(
+		$icon = html_writer::tag('i', '', array('class' => 'fa fa-search'));
+		$r .= html_writer::tag(
 			'button',
 			$icon . ' ' . $this->str('search'),
 			array('class' => 'searchButton')
@@ -79,13 +81,13 @@ class DisplayManager
 
 		if ($showOptions) {
 
-			$r .= \html_writer::start_tag('div', array('class' => 'options'));
+			$r .= html_writer::start_tag('div', array('class' => 'options'));
 
 			$allowNoAccess = get_config('block_search', 'allow_no_access');
 			$showOptionsTitle = $allowNoAccess || !empty($courseID);
 
 			if ($showOptionsTitle) {
-				$icon = \html_writer::tag('i', '', array('class' => 'fa fa-cogs'));
+				$icon = html_writer::tag('i', '', array('class' => 'fa fa-cogs'));
 				$r .= '<strong>' . $icon . ' ' . $this->str('search_options') . '</strong>';
 			}
 
@@ -93,7 +95,7 @@ class DisplayManager
 			if ($courseID) {
 
 				// hidden courseID field
-				$r .= \html_writer::empty_tag('input', array(
+				$r .= html_writer::empty_tag('input', array(
 					'type' => 'hidden',
 					'name' => 'courseID',
 					'value' => $courseID
@@ -109,9 +111,9 @@ class DisplayManager
 					$inputParams['checked'] = 'checked';
 				}
 
-				$r .= \html_writer::tag(
+				$r .= html_writer::tag(
 					'label',
-					\html_writer::empty_tag('input', $inputParams) . $this->str('search_all_of_site', $SITE->shortname)
+					html_writer::empty_tag('input', $inputParams) . $this->str('search_all_of_site', $SITE->shortname)
 				);
 
 				$inputParams = array(
@@ -123,10 +125,10 @@ class DisplayManager
 					$inputParams['checked'] = 'checked';
 				}
 
-				$courseName = \MoodleSearch\DataManager::getCourseName($courseID);
-				$r .= \html_writer::tag(
+				$courseName = DataManager::getCourseName($courseID);
+				$r .= html_writer::tag(
 					'label',
-					\html_writer::empty_tag('input', $inputParams) . $this->str('search_in_course', $courseName)
+					html_writer::empty_tag('input', $inputParams) . $this->str('search_in_course', $courseName)
 				);
 
 			}
@@ -144,20 +146,20 @@ class DisplayManager
 					$checkboxAttributes['checked'] = 'checked';
 				}
 
-				$checkbox = \html_writer::empty_tag('input', $checkboxAttributes);
+				$checkbox = html_writer::empty_tag('input', $checkboxAttributes);
 
-				$r .= \html_writer::tag(
+				$r .= html_writer::tag(
 					'label',
 					$checkbox . $this->str('include_hidden_results')
 				);
 			}
 
-			$r .= \html_writer::end_tag('div');
+			$r .= html_writer::end_tag('div');
 
 		} elseif ($courseID) {
 
 			//If we're not showing the options, but have a courseID we still need to add that to the form
-			$r .= \html_writer::empty_tag(
+			$r .= html_writer::empty_tag(
 				'input',
 				array(
 					'type' => 'hidden',
@@ -168,7 +170,7 @@ class DisplayManager
 
 		}
 
-		$r .= \html_writer::end_tag('form');
+		$r .= html_writer::end_tag('form');
 
 		return $r;
 	}
@@ -177,16 +179,16 @@ class DisplayManager
 	//Shows the 'quick jump' box on the left of the results page
 	public function showResultsNav($results, $currentPage)
 	{
-		$r = \html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
+		$r = html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 
-		$r .= \html_writer::start_tag('div', array('class' => 'header'));
-			$r .= \html_writer::start_tag('div', array('class' => 'title'));
-				$r .= \html_writer::tag('h2', $this->str('items_found', number_format($results['total'])));
-			$r .= \html_writer::end_tag('div');
-		$r .= \html_writer::end_tag('div');
+		$r .= html_writer::start_tag('div', array('class' => 'header'));
+			$r .= html_writer::start_tag('div', array('class' => 'title'));
+				$r .= html_writer::tag('h2', $this->str('items_found', number_format($results['total'])));
+			$r .= html_writer::end_tag('div');
+		$r .= html_writer::end_tag('div');
 
-		$r .= \html_writer::start_tag('div', array('class' => 'content'));
-		$r .= \html_writer::start_tag('ul');
+		$r .= html_writer::start_tag('div', array('class' => 'content'));
+		$r .= html_writer::start_tag('ul');
 
 		foreach ($results['tables'] as $tableName => $tableInfo) {
 			if ($tableInfo['count'] < 1) {
@@ -195,12 +197,12 @@ class DisplayManager
 			$sectionDetails = $this->tableName($tableName);
 
 			if ($tableInfo['hiddenCount'] > 0) {
-				$countLabel = \html_writer::tag(
+				$countLabel = html_writer::tag(
 					'span',
 					$tableInfo['visibleCount'] . ' + ' . $tableInfo['count'] . ' hidden'
 				);
 			} else {
-				$countLabel = \html_writer::tag(
+				$countLabel = html_writer::tag(
 					'span',
 					$tableInfo['visibleCount']
 				);
@@ -215,18 +217,18 @@ class DisplayManager
 				$href = $url->out(false) . "#searchresults-{$tableName}";
 			}
 
-			$a = \html_writer::tag(
+			$a = html_writer::tag(
 				'a',
 				$countLabel . $sectionDetails['icon'] . $sectionDetails['title'],
 				array('href' => $href)
 			);
 
-			$r .= \html_writer::tag('li', $a);
+			$r .= html_writer::tag('li', $a);
 		}
 
-		$r .= \html_writer::end_tag('ul');
-		$r .= \html_writer::end_tag('div');
-		$r .= \html_writer::end_tag('div');
+		$r .= html_writer::end_tag('ul');
+		$r .= html_writer::end_tag('div');
+		$r .= html_writer::end_tag('div');
 
 		return $r;
 	}
@@ -255,19 +257,19 @@ class DisplayManager
 
 				if ($currentTable !== false) {
 					//Close the previous section
-					$r .= \html_writer::end_tag('ul');
+					$r .= html_writer::end_tag('ul');
 				}
 
 				//Section header in results
 				$sectionDetails = $this->tableName($result->tableName);
-				$r .= \html_writer::tag(
+				$r .= html_writer::tag(
 					'h3',
 					$sectionDetails['icon'] . ' ' . $sectionDetails['title'],
 					array('id' => 'searchresults-' . $result->tableName)
 				);
 
 				//Show results from this table
-				$r .= \html_writer::start_tag('ul', array('class' => 'results'));
+				$r .= html_writer::start_tag('ul', array('class' => 'results'));
 
 				$currentTable = $result->tableName;
 			}
@@ -275,7 +277,7 @@ class DisplayManager
 			$r .= $this->showResult($result->tableName, $result, $sectionDetails['icon']);
 		}
 
-		$r .= \html_writer::end_tag('ul');
+		$r .= html_writer::end_tag('ul');
 
 		$this->displayTime = DataManager::debugTimeTaken($startTime);
 
@@ -292,19 +294,19 @@ class DisplayManager
 			case 'course_categories':
 				return array(
 					'title' => get_string('categories', 'moodle'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-folder-open'))
+					'icon' => html_writer::tag('i', '', array('class' => 'fa fa-folder-open'))
 				);
 				break;
 			case 'course':
 				return array(
 					'title' => get_string('courses', 'moodle'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-archive'))
+					'icon' => html_writer::tag('i', '', array('class' => 'fa fa-archive'))
 				);
 				break;
 			case 'folder_files':
 				return array(
 					'title' => $this->str('folder_contents'),
-					'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-folder'))
+					'icon' => html_writer::tag('i', '', array('class' => 'fa fa-folder'))
 				);
 				break;
 			default:
@@ -316,7 +318,7 @@ class DisplayManager
 				} else {
 					return array(
 						'title' =>$tableName, //oops no localization
-						'icon' => \html_writer::tag('i', '', array('class' => 'fa fa-certificate'))
+						'icon' => html_writer::tag('i', '', array('class' => 'fa fa-certificate'))
 					);
 				}
 		}
@@ -332,10 +334,10 @@ class DisplayManager
 			$liClasses .= ' hideresult';
 		}
 
-		$r = \html_writer::start_tag('li', array('class' => $liClasses));
+		$r = html_writer::start_tag('li', array('class' => $liClasses));
 
 		//Show the path
-		$r .= \html_writer::tag('ul', $this->showPath($result->path()), array('class' => 'path'));
+		$r .= html_writer::tag('ul', $this->showPath($result->path()), array('class' => 'path'));
 
 		if (!empty($result->hiddenReason)) {
 			if ($result->hiddenReason == 'notenrolled') {
@@ -344,8 +346,8 @@ class DisplayManager
 				$niceHiddenReason = $this->str('hidden_not_available');
 			}
 
-			$hiddenIcon = \html_writer::tag('i', '', array('class' => 'fa fa-times'));
-			$r .= \html_writer::tag(
+			$hiddenIcon = html_writer::tag('i', '', array('class' => 'fa fa-times'));
+			$r .= html_writer::tag(
 				'h5',
 				$hiddenIcon . ' ' .$niceHiddenReason,
 				array('class' => 'hiddenReason')
@@ -357,7 +359,7 @@ class DisplayManager
 			$icon = $defaultSectionIcon;
 		}
 
-		$r .= \html_writer::tag(
+		$r .= html_writer::tag(
 			'a',
 			$icon . $result->name(),
 			array(
@@ -369,10 +371,10 @@ class DisplayManager
 		if ($d = $result->description()) {
 			$d = strip_tags($d);
 			$d = $this->wordTruncate($d, 350);
-			$r .= \html_writer::tag('p', $d);
+			$r .= html_writer::tag('p', $d);
 		}
 
-		$r .= \html_writer::end_tag('li');
+		$r .= html_writer::end_tag('li');
 
 		return $r;
 	}
@@ -381,8 +383,8 @@ class DisplayManager
 	{
 		$r = '';
 		foreach ($path as $item) {
-			$icon = \html_writer::tag('i', '', array('class' => $item['icon']));
-			$a = \html_writer::tag(
+			$icon = html_writer::tag('i', '', array('class' => $item['icon']));
+			$a = html_writer::tag(
 				'a',
 				$icon . ' ' . $item['name'],
 				array(
@@ -390,7 +392,7 @@ class DisplayManager
 					'title' => $item['title']
 				)
 			);
-			$r .= \html_writer::tag('li', $a);
+			$r .= html_writer::tag('li', $a);
 		}
 		return $r;
 	}

@@ -1,12 +1,15 @@
 <?php
 
-namespace MoodleSearch;
+namespace MoodleSearch\Models;
+
+use html_writer;
+use moodle_url;
 
 class CourseResult extends Result
 {
 	public function icon()
 	{
-		return \html_writer::tag('i', '', array('class' => 'fa fa-archive'));
+		return html_writer::tag('i', '', array('class' => 'fa fa-archive'));
 	}
 
 	public function name()
@@ -16,7 +19,7 @@ class CourseResult extends Result
 
 	public function url()
 	{
-		return new \moodle_url('/course/view.php', array('id' => $this->row->id));
+		return new moodle_url('/course/view.php', array('id' => $this->row->id));
 	}
 
 	public function path()

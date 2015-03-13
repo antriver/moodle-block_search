@@ -1,6 +1,10 @@
 <?php
 
-namespace MoodleSearch;
+namespace MoodleSearch\Models;
+
+use html_writer;
+use moodle_url;
+use MoodleSearch\DataManager;
 
 class ModuleResult extends Result
 {
@@ -13,7 +17,7 @@ class ModuleResult extends Result
 	public function url()
 	{
 		$resourceID = DataManager::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
-		return new \moodle_url('/mod/' . $this->tableName . '/view.php', array('id' => $resourceID));
+		return new moodle_url('/mod/' . $this->tableName . '/view.php', array('id' => $resourceID));
 	}
 
 	public function path()
@@ -31,7 +35,7 @@ class ModuleResult extends Result
 		$path[] = array(
 			'title' => 'Course',
 			'name' => $course->fullname,
-			'url' => new \moodle_url('/course/view.php', array('id' => $course->id)),
+			'url' => new moodle_url('/course/view.php', array('id' => $course->id)),
 			'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
 		);
 
@@ -41,7 +45,7 @@ class ModuleResult extends Result
 			$path[] = array(
 				'title' => 'Section',
 				'name' => $section->name,
-				'url' => new \moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
+				'url' => new moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
 				'icon' => 'fa fa-th'
 			);
 		}

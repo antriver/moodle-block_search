@@ -21,7 +21,10 @@
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace MoodleSearch;
+namespace MoodleSearch\Models;
+
+use context_course;
+use moodle_url;
 
 abstract class Result
 {
@@ -107,7 +110,7 @@ abstract class Result
 			$path[] = array(
 				'title' => 'Category',
 				'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryID)),
-				'url' => new \moodle_url('/course/index.php', array('categoryid' => $categoryID)),
+				'url' => new moodle_url('/course/index.php', array('categoryid' => $categoryID)),
 				'icon' => !empty($categoryIcon) ? 'fa fa-'.$categoryIcon : 'fa fa-folder-open'
 			);
 		}
@@ -139,7 +142,7 @@ abstract class Result
 
 		global $USER;
 
-		$coursecontext = \context_course::instance($courseID, IGNORE_MISSING);
+		$coursecontext = context_course::instance($courseID, IGNORE_MISSING);
 		if (!$coursecontext) {
 			//If the course ID is set, but doesn't exist
 			error_log(

@@ -23,6 +23,10 @@
 
 namespace MoodleSearch;
 
+use cache;
+use moodle_url;
+use MoodleSearch\Models\Search;
+
 class Block
 {
 	public $display;
@@ -31,15 +35,20 @@ class Block
 
 	public function __construct()
 	{
+        error_reporting(E_ALL);
+        ini_set('display_errors', 1);
+
 		//TODO: Autoloader would be nice here
-		require_once __DIR__ . '/Model/Result.php';
-		require_once __DIR__ . '/Model/Results/CourseResult.php';
-		require_once __DIR__ . '/Model/Results/CategoryResult.php';
-		require_once __DIR__ . '/Model/Results/FileInFolderResult.php';
-		require_once __DIR__ . '/Model/Results/ModuleResult.php';
-		require_once __DIR__ . '/Model/Search.php';
 		require_once __DIR__ . '/DataManager.php';
 		require_once __DIR__ . '/DisplayManager.php';
+        require_once __DIR__ . '/DummyCourseModinfo.php';
+        require_once __DIR__ . '/Utils.php';
+        require_once __DIR__ . '/Models/Result.php';
+        require_once __DIR__ . '/Models/CourseResult.php';
+        require_once __DIR__ . '/Models/CategoryResult.php';
+        require_once __DIR__ . '/Models/FileInFolderResult.php';
+        require_once __DIR__ . '/Models/ModuleResult.php';
+        require_once __DIR__ . '/Models/Search.php';
 		$this->display = new DisplayManager($this);
 	}
 
@@ -51,7 +60,7 @@ class Block
 
 	public function getFullURL()
 	{
-		return new \moodle_url($this->path);
+		return new moodle_url($this->path);
 	}
 
 	public function search($q, $courseID = 0, $removeHiddenResults = false)
@@ -76,7 +85,7 @@ class Block
 
 			$cacheKey = md5(json_encode(array($q, $courseID, $removeHiddenResults)));
 
-			$userCache = \cache::make('block_search', 'user_searches');
+			$userCache = cache::make('block_search', 'user_searches');
 			if ($results = $userCache->get($cacheKey)) {
 
 				if ($results['filtered'] > (time() - (int)$userCacheValidFor)) {
