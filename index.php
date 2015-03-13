@@ -69,6 +69,7 @@ if (!empty($q)) {
 
 	//Log the search (if logging is enabled)
 	if (get_config('block_search', 'log_searches') == 1) {
+        // FIXME: add_to_log() has been deprecated, please rewrite your code to the new events API
 		add_to_log($courseID, 'block_search', 'search', '/blocks/search', $q, 0, $USER->id);
 	}
 
