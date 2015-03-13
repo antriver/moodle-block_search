@@ -21,11 +21,11 @@
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace MoodleSearch;
+namespace block_search;
 
 use cache;
 use moodle_url;
-use MoodleSearch\Models\Search;
+use block_search\Models\Search;
 
 class Block
 {
@@ -35,20 +35,8 @@ class Block
 
 	public function __construct()
 	{
-        error_reporting(E_ALL);
-        ini_set('display_errors', 1);
+		// Classes are now autoloaded
 
-		//TODO: Autoloader would be nice here
-		require_once __DIR__ . '/DataManager.php';
-		require_once __DIR__ . '/DisplayManager.php';
-        require_once __DIR__ . '/DummyCourseModinfo.php';
-        require_once __DIR__ . '/Utils.php';
-        require_once __DIR__ . '/Models/Result.php';
-        require_once __DIR__ . '/Models/CourseResult.php';
-        require_once __DIR__ . '/Models/CategoryResult.php';
-        require_once __DIR__ . '/Models/FileInFolderResult.php';
-        require_once __DIR__ . '/Models/ModuleResult.php';
-        require_once __DIR__ . '/Models/Search.php';
 		$this->display = new DisplayManager($this);
 	}
 
@@ -71,7 +59,7 @@ class Block
 			);
 		}
 
-		raise_memory_limit(MEMORY_EXTRA);
+		raise_memory_limit(MEMORY_UNLIMITED);
 
 		//Check if user cached results exist
 		$userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');

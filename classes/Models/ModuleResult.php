@@ -1,10 +1,10 @@
 <?php
 
-namespace MoodleSearch\Models;
+namespace block_search\Models;
 
 use html_writer;
 use moodle_url;
-use MoodleSearch\DataManager;
+use block_search\DataManager;
 
 class ModuleResult extends Result
 {

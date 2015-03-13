@@ -1,6 +1,6 @@
 <?php
 
-namespace MoodleSearch;
+namespace block_search;
 
 use course_modinfo;
 use section_info;

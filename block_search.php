@@ -40,8 +40,8 @@ class block_search extends block_base
 		$PAGE->requires->css('/blocks/search/assets/font-awesome-4.0.3/css/font-awesome.min.css');
 		$PAGE->requires->css('/blocks/search/assets/css/block.css');
 
-		require_once(dirname(__FILE__) . '/MoodleSearch/Block.php');
-		$searchBlock = new \MoodleSearch\Block();
+		require_once(dirname(__FILE__) . '/classes/Block.php');
+		$searchBlock = new \block_search\Block();
 
 		$q = isset($_GET['q']) ? $_GET['q'] : '';
 

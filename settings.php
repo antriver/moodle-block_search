@@ -23,12 +23,12 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/blocks/search/MoodleSearch/DataManager.php');
+require_once($CFG->dirroot . '/blocks/search/classes/DataManager.php');
 
 /*
  * Tables to search
  */
-$possibleTables = \MoodleSearch\DataManager::getTablesPossibleToSearch();
+$possibleTables = \block_search\DataManager::getTablesPossibleToSearch();
 $settings->add(
 	new admin_setting_configmulticheckbox(
 		'block_search/search_tables',

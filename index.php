@@ -27,8 +27,8 @@ require_login();
 
 require_capability('block/search:search', context_system::instance());
 
-require_once __DIR__ . '/MoodleSearch/Block.php';
-$searchBlock = new MoodleSearch\Block();
+require_once __DIR__ . '/classes/Block.php';
+$searchBlock = new block_search\Block();
 
 $q = optional_param('q', '', PARAM_RAW);
 $escapedq = htmlentities($q);

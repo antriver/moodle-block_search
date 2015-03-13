@@ -17,19 +17,19 @@
 /**
  * Object to represent an entire search action.
  * Creating a new search runs the search. Use getResults to get the results.
- * Will return an array of MoodleSearch\Result objects.
+ * Will return an array of block_search\Models\Result objects.
  * @package	   block_search
  * @copyright	 Anthony Kuske <www.anthonykuske.com>
  * @license	   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace MoodleSearch\Models;
+namespace block_search\Models;
 
 use Exception;
 use xmldb_field;
 use xmldb_table;
-use MoodleSearch\DataManager;
-use MoodleSearch\Utils;
+use block_search\DataManager;
+use block_search\Utils;
 
 class Search
 {
@@ -271,7 +271,7 @@ class Search
 				$className = 'ModuleResult';
 				break;
 		}
-		$className = '\MoodleSearch\Models\\' . $className;
+		$className = '\block_search\Models\\' . $className;
 
 		foreach ($rows as $row) {
 			$results[] = new $className($tableName, $row);

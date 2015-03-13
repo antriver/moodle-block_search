@@ -1,6 +1,6 @@
 <?php
 
-namespace MoodleSearch;
+namespace block_search;
 
 class Utils
 {
