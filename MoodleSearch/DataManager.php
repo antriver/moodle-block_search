@@ -137,6 +137,7 @@ class DataManager
 			return false;
 		}
 
+/*
 		// Create our own cm_info instance for this module
 		// because using get_fast_modinfo is horrible inefficient
 		// Begin new way...
@@ -172,7 +173,7 @@ class DataManager
 		}
 
 		// End new way.
-
+*/
 
 		// Begin old way...
 
@@ -180,14 +181,10 @@ class DataManager
 		//This is pretty expensive and is likely the source of any slowness,
 		//because get_fast_modinfo loads info for all the modules in the course
 		//even though we only want the one
-		/*$modinfo = get_fast_modinfo($courseID, $USER->id);
+		$modinfo = get_fast_modinfo($courseID, $USER->id);
 
 		try {
 			$cm = $modinfo->get_cm($cmid);
-
-			print_object(memory_get_usage()/1024/1024);
-			print_object('Max: ' . memory_get_peak_usage()/1024/1024);
-			echo '<hr/>';
 
 			if (!$cm->uservisible) {
 				return false;
@@ -196,7 +193,7 @@ class DataManager
 			//Throws a moodle_exception if it's not found
 		} catch (moodle_exception $e) {
 			return false;
-		}*/
+		}
 
 		// End old way.
 
