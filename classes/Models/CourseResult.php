@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @package    block_search
+ * @copyright  Anthony Kuske <www.anthonykuske.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 namespace block_search\Models;
 
 use html_writer;
