@@ -37,4 +37,15 @@ $capabilities = array(
 		),
 	),
 
+    'block/search:myaddinstance' => array(
+        'riskbitmask' => RISK_SPAM | RISK_XSS,
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'clonepermissionsfrom' => 'moodle/site:manageblocks',
+        'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        ),
+    ),
+
 );
