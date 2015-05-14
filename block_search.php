@@ -43,7 +43,7 @@ class block_search extends block_base
         require_once(dirname(__FILE__) . '/classes/Block.php');
         $searchblock = new \block_search\Block();
 
-        $q = isset($_GET['q']) ? $_GET['q'] : '';
+        $q = optional_param('q', '', PARAM_RAW);
 
         $courseid = (is_object($this->page->course) && $this->page->course->id > 1) ? $this->page->course->id : false;
         $coursename = $courseid ? $this->page->course->fullname : $SITE->shortname;

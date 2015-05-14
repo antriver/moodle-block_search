@@ -116,14 +116,14 @@ class Search
                     }
 
                     // Check if each of these fields (columns) exists in the table.
-                    foreach ($modulefields as $fieldmame) {
+                    foreach ($modulefields as $fieldname) {
 
                         // Create an xmldb object for this field's name.
-                        $field = new xmldb_field($fieldmame);
+                        $field = new xmldb_field($fieldname);
 
                         // If this field exists in the table, we're going to search in it.
                         if ($dbman->field_exists($table, $field)) {
-                            $fieldstosearch[$tablename][] = $fieldmame;
+                            $fieldstosearch[$tablename][] = $fieldname;
                         }
 
                     }
@@ -232,8 +232,8 @@ class Search
         $queryparameters = array();
 
         // Build the SQL query.
-        foreach ($fields as $fieldmame) {
-            $where .= $this->build_word_query($fieldmame, $this->q, $queryparameters) . ' OR ';
+        foreach ($fields as $fieldname) {
+            $where .= $this->build_word_query($fieldname, $this->q, $queryparameters) . ' OR ';
         }
         $where = rtrim($where, 'OR ');
 
@@ -486,8 +486,8 @@ class Search
 
         if (!$removehiddenresults) {
             // Hidden results are included, but we want them to go to the bottom
-            // Sort the results by 'tableName' then by 'hidden'
-            $this->results['results'] = Utils::sort_multidimensional_array($this->results['results'], "tableName ASC, hidden ASC");
+            // Sort the results by 'tablename' then by 'hidden'
+            $this->results['results'] = Utils::sort_multidimensional_array($this->results['results'], "tablename ASC, hidden ASC");
         }
 
         $this->results['filterTime'] = DataManager::get_debug_time_taken($starttime);
