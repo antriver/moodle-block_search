@@ -1,10 +1,10 @@
 /* Styles used by the search block when displayed as a block on a normal Moodle page */
 
-.searchBlockForm {
+.block-search-form {
 	white-space: nowrap;
 }
 
-.searchBlockForm label {
+.block-search-form label {
 	font-size:12px;
 	display:inline-block;
 	margin-top:5px;
@@ -12,7 +12,7 @@
 	cursor:pointer;
 }
 
-.searchBlockForm input[type=text] {
+.block-search-form input[type=text] {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -23,7 +23,7 @@
 	height: auto;
 }
 
-.searchBlockForm button {
+.block-search-form button {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;

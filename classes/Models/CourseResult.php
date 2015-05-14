@@ -44,11 +44,11 @@ class CourseResult extends Result
 
     public function path() {
 
-        return $this->getCategoryPath($this->row->category);
+        return $this->get_category_path($this->row->category);
     }
 
-    public function isVisible() {
+    public function is_visible() {
 
-        return $this->isCourseVisible($this->row->id);
+        return $this->is_course_visible($this->row->id);
     }
 }

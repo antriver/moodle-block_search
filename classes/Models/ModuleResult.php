@@ -31,36 +31,36 @@ class ModuleResult extends Result
     public function icon() {
 
         global $OUTPUT;
-        return trim($OUTPUT->pix_icon('icon', '', $this->tableName, array('class' => 'icon')));
+        return trim($OUTPUT->pix_icon('icon', '', $this->tablename, array('class' => 'icon')));
     }
 
     public function url() {
 
-        $resourceID = DataManager::getGlobalInstanceIDFromModuleInstanceID($this->tableName, $this->row->id);
-        return new moodle_url('/mod/' . $this->tableName . '/view.php', array('id' => $resourceID));
+        $resourceid = DataManager::get_global_instance_id_from_module_instance_id($this->tablename, $this->row->id);
+        return new moodle_url('/mod/' . $this->tablename . '/view.php', array('id' => $resourceid));
     }
 
     public function path() {
 
-        //Get all info for the course this resource is in
-        $course = DataManager::getCourse($this->row->course);
+        // Get all info for the course this resource is in.
+        $course = DataManager::get_course($this->row->course);
 
-        $path = $this->getCategoryPath($course->category);
+        $path = $this->get_category_path($course->category);
 
         if (function_exists('\course_get_icon')) {
-            $courseIcon = \course_get_icon($course->id);
+            $courseicon = \course_get_icon($course->id);
         } else {
-            $courseIcon = false;
+            $courseicon = false;
         }
         $path[] = array(
             'title' => 'Course',
             'name' => $course->fullname,
             'url' => new moodle_url('/course/view.php', array('id' => $course->id)),
-            'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
+            'icon' => !empty($courseicon) ? 'fa fa-'.$courseicon : 'fa fa-archive'
         );
 
-        //Get all info for the course section this resource is in
-        $section = DataManager::getResourceSection($this->tableName, $this->row->id);
+        // Get all info for the course section this resource is in.
+        $section = DataManager::get_resource_section($this->tablename, $this->row->id);
         if ($section->name) {
             $path[] = array(
                 'title' => 'Section',
@@ -72,14 +72,14 @@ class ModuleResult extends Result
         return $path;
     }
 
-    public function isVisible() {
+    public function is_visible() {
 
         // Is user enroled in the course the folder is in?
-        if (($error = $this->isCourseVisible($this->row->course)) !== true) {
+        if (($error = $this->is_course_visible($this->row->course)) !== true) {
             return $error;
         }
 
-        if (DataManager::canUserSeeModule($this->row->course, $this->tableName, $this->row->id)) {
+        if (DataManager::can_user_see_module($this->row->course, $this->tablename, $this->row->id)) {
             return true;
         } else {
             return 'notvisible';

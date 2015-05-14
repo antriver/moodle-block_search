@@ -29,7 +29,7 @@ require_once($CFG->dirroot . '/blocks/search/classes/DataManager.php');
 /**
  * Tables to search
  */
-$tables = \block_search\DataManager::getTablesPossibleToSearch();
+$tables = \block_search\DataManager::get_tables_possible_to_search();
 $settings->add(
     new admin_setting_configmulticheckbox(
         'block_search/search_tables',

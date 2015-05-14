@@ -49,7 +49,7 @@ class block_search extends block_base
         $coursename = $courseid ? $this->page->course->fullname : $SITE->shortname;
 
         $this->content = new stdClass;
-        $this->content->text = $searchblock->display->showSearchBox(
+        $this->content->text = $searchblock->display->show_search_box(
             $q,
             $courseid,
             false,

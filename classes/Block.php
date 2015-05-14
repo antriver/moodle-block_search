@@ -31,7 +31,7 @@ use block_search\Models\Search;
 class Block
 {
     public $display;
-    public $blockName = 'block_search';
+    public $blockname = 'block_search';
     private $path = '/blocks/search/';
 
     public function __construct() {
@@ -41,18 +41,12 @@ class Block
         $this->display = new DisplayManager($this);
     }
 
-    public function getFullPath() {
-
-        global $CFG;
-        return $CFG->dirroot . $this->path;
-    }
-
-    public function getFullURL() {
+    public function get_full_url() {
 
         return new moodle_url($this->path);
     }
 
-    public function search($q, $courseID = 0, $removeHiddenResults = false) {
+    public function search($q, $courseid = 0, $removehiddenresults = false) {
 
         if (strlen($q) < 2) {
             return array(
@@ -62,22 +56,22 @@ class Block
 
         raise_memory_limit(MEMORY_UNLIMITED);
 
-        //Check if user cached results exist
-        $userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
-        $useUserCache = $userCacheValidFor > 0;
+        // Check if user cached results exist. for this user.
+        $usercachevalidfor = (int)get_config('block_search', 'cache_results_per_user');
+        $useusercache = $usercachevalidfor > 0;
 
         if (is_siteadmin()) {
-            $useUserCache = false;
+            $useusercache = false;
         }
 
-        if ($useUserCache) {
+        if ($useusercache) {
 
-            $cacheKey = md5(json_encode(array($q, $courseID, $removeHiddenResults)));
+            $cachekey = md5(json_encode(array($q, $courseid, $removehiddenresults)));
 
-            $userCache = cache::make('block_search', 'user_searches');
-            if ($results = $userCache->get($cacheKey)) {
+            $usercache = cache::make('block_search', 'user_searches');
+            if ($results = $usercache->get($cachekey)) {
 
-                if ($results['filtered'] > (time() - (int)$userCacheValidFor)) {
+                if ($results['filtered'] > (time() - (int)$usercachevalidfor)) {
                     $results['userCached'] = true;
                     return $results;
                 }
@@ -85,12 +79,12 @@ class Block
 
         }
 
-        $search = new Search($q, $courseID);
-        $search->filterResults($removeHiddenResults);
-        $results = $search->getResults();
+        $search = new Search($q, $courseid);
+        $search->filter_results($removehiddenresults);
+        $results = $search->get_results();
 
-        if ($useUserCache) {
-            $userCache->set($cacheKey, $results);
+        if ($useusercache) {
+            $usercache->set($cachekey, $results);
         }
 
         return $results;
@@ -108,7 +102,7 @@ class Block
             return $this->version;
         }
         $plugin = new \stdClass;
-        include dirname(__DIR__) . '/version.php';
+        include(dirname(__DIR__) . '/version.php');
         $this->version = $plugin->version;
         return $this->version;
     }

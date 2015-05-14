@@ -46,31 +46,30 @@ class FileInFolderResult extends Result
 
     public function path() {
 
-        //Get all info for the course this resource is in
-        $course = DataManager::getCourse($this->row->courseid);
+        // Get all info for the course this resource is in.
+        $course = DataManager::get_course($this->row->courseid);
 
-        $path = $this->getCategoryPath($course->category);
+        $path = $this->get_category_path($course->category);
 
         if (function_exists('\course_get_icon')) {
-            $courseIcon = \course_get_icon($course->id);
+            $courseicon = \course_get_icon($course->id);
         } else {
-            $courseIcon = false;
+            $courseicon = false;
         }
         $path[] = array(
             'title' => 'Course',
             'name' => $course->fullname,
             'url' => new moodle_url('/course/view.php', array('id' => $course->id)),
-            'icon' => !empty($courseIcon) ? 'fa fa-'.$courseIcon : 'fa fa-archive'
+            'icon' => !empty($courseicon) ? 'fa fa-'.$courseicon : 'fa fa-archive'
         );
 
-        //Get all info for the course section this resource is in
-        $section = DataManager::getResoureSectionFromCourseModuleID($this->row->moduleid);
+        // Get all info for the course section this resource is in.
+        $section = DataManager::get_resource_section_from_course_module_id($this->row->moduleid);
         if ($section->name) {
             $path[] = array(
                 'title' => 'Section',
                 'name' => $section->name,
-                //TODO: Is sectionid used by vanilla Moodle, or was that an SSIS tweak? I forgot
-                'url' => new moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id)),
+                'url' => new moodle_url('/course/view.php', array('id' => $course->id, 'sectionid' => $section->id, 'section' => $section->section)),
                 'icon' => 'fa fa-th'
             );
         }
@@ -96,7 +95,7 @@ class FileInFolderResult extends Result
         return $path;
     }
 
-    public function isVisible() {
+    public function is_visible() {
 
         // Is it set as visible?
         if (!$this->row->modulevisible) {
@@ -104,13 +103,13 @@ class FileInFolderResult extends Result
         }
 
         // Is user enroled in the course the folder is in?
-        if (($error = $this->isCourseVisible($this->row->courseid)) !== true) {
+        if (($error = $this->is_course_visible($this->row->courseid)) !== true) {
             return $error;
         }
 
         return true;
 
-        //This was far too slow...
+        // This was far too slow...
         /*$modulecontext = \context_module::instance($this->row->moduleid);
         if (has_capability('mod/folder:view', $modulecontext)) {
             return true;

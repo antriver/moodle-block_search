@@ -16,7 +16,7 @@
 
 /**
  * Object to represent an entire search action.
- * Creating a new search runs the search. Use getResults to get the results.
+ * Creating a new search runs the search. Use get_results to get the results.
  * Will return an array of block_search\Models\Result objects.
  *
  * @package    block_search
@@ -34,27 +34,23 @@ use block_search\Utils;
 
 class Search
 {
-    private $q = false; //The search query
-    private $results = null; //Search results
-    private $courseID = false; //CourseID to search in
-    private $userID = false; //UserID that performed the search
-    private $tables = false; //Tabls to search in
-    private $refreshCache = false;
-    private $textSubstitutions = null;
+    private $q = false; // The search query.
+    private $results = null; // Search results.
+    private $courseid = false; // CourseID to search in.
+    private $userid = false; // UserID that performed the search.
+    private $tables = false; // Tabels to search in.
+    private $refreshcache = false;
+    private $textsubstitutions = null;
 
-    public function __construct($q, $courseID = false, $userID = false) {
+    public function __construct($q, $courseid = false, $userid = false, $refreshcache = false) {
 
         $this->q = $q;
-        $this->courseID = $courseID;
-
-        if (isset($_GET['refresh'])) {
-            $this->refreshCache = true;
-        }
-
-        $this->results = $this->runSearch();
+        $this->courseid = $courseid;
+        $this->refreshcache = $refreshcache;
+        $this->results = $this->run_search();
     }
 
-    public function getResults() {
+    public function get_results() {
 
         if ($this->results === null) {
             throw new Exception('Trying to get results before the search has been run.');
@@ -62,70 +58,72 @@ class Search
         return $this->results;
     }
 
-    //Builds an associative array of which fields in which tables to search in
-    private function getFieldsToSearch() {
+    /**
+     * Builds an associative array of which fields in which tables to search in
+     * @return array
+     */
+    private function get_fields_to_search() {
 
         global $DB;
 
-        //Load the config setting for tables to search
-        //(A comma seperated list of table names without the prefix)
-        $tablesToSearch = get_config('block_search', 'search_tables');
-        $tablesToSearch = explode(',', $tablesToSearch);
+        // Load the config setting for tables to search.
+        // (A comma seperated list of table names without the prefix)
+        $tablestosearch = get_config('block_search', 'search_tables');
+        $tablestosearch = explode(',', $tablestosearch);
 
-        //This array will hold the tables => array('fields') we'll actually search
-        $fieldsToSearch = array();
+        // This array will hold the tables => array('fields') we'll actually search.
+        $fieldstosearch = array();
 
-        //Database manager object
         $dbman = $DB->get_manager();
 
-        //Go through each table the admin wants to be searched and set which fields from that table to search
-        //(Makes sure the tables and fields exist)
-        foreach ($tablesToSearch as $tableName) {
+        // Go through each table the admin wants to be searched and set which fields from that table to search.
+        // (Makes sure the tables and fields exist)
+        foreach ($tablestosearch as $tablename) {
 
-            switch ($tableName) {
+            switch ($tablename) {
 
                 case 'course':
-                    //Don't show other courses if we're searching within a certain in a course
-                    if ($this->courseID) {
+                    // Don't show other courses if we're searching within a certain in a course.
+                    if ($this->courseid) {
                         continue;
                     }
-                    $fieldsToSearch['course'] = array('fullname', 'shortname');
+                    $fieldstosearch['course'] = array('fullname', 'shortname');
                     break;
 
                 case 'course_categories':
-                    //Don't show other courses if we're searching in a course
-                    if ($this->courseID) {
+                    // Don't show other courses if we're searching in a course.
+                    if ($this->courseid) {
                         continue;
                     }
-                    $fieldsToSearch['course_categories'] = array('name', 'description');
+                    $fieldstosearch['course_categories'] = array('name', 'description');
                     break;
 
                 default:
-                    //Create an xmldb object from the name of this table
-                    $table = new xmldb_table($tableName);
+                    // Create an xmldb object from the name of this table.
+                    $table = new xmldb_table($tablename);
 
-                    //Skip this module if it has no table
-                    //(Only checks if a table with the same name as the module exists)
+                    // Skip this module if it has no table.
+                    // (Only checks if a table with the same name as the module exists)
                     if (!$dbman->table_exists($table)) {
                         continue;
                     }
 
-                    //We want to check if these fields exist in the table
-                    $moduleFields = array('name', 'intro');
+                    // We want to check if these fields exist in the table.
+                    $modulefields = array('name', 'intro');
 
-                    if ($tableName == 'page') {
-                        $moduleFields[] = 'content';
+                    if ($tablename == 'page') {
+                        $modulefields[] = 'content';
                     }
 
-                    //Check if each of these fields (columns) exists in the table
-                    foreach ($moduleFields as $fieldName) {
+                    // Check if each of these fields (columns) exists in the table.
+                    foreach ($modulefields as $fieldmame) {
 
-                        //Create an xmldb object for this field's name
-                        $field = new xmldb_field($fieldName);
+                        // Create an xmldb object for this field's name.
+                        $field = new xmldb_field($fieldmame);
 
-                        //If this field exists in the table, we're going to search in it
+                        // If this field exists in the table, we're going to search in it.
                         if ($dbman->field_exists($table, $field)) {
-                            $fieldsToSearch[$tableName][] = $fieldName;
+                            $fieldstosearch[$tablename][] = $fieldmame;
                         }
 
                     }
@@ -133,44 +131,46 @@ class Search
             }
         }
 
-        //Search in folder files?
+        // Search in folder files?
         if (get_config('block_search', 'search_files_in_folders')) {
-            $fieldsToSearch['folder_files'] = array();
+            $fieldstosearch['folder_files'] = array();
         }
 
-        //Sort by by table name
-        ksort($fieldsToSearch);
+        // Sort by by table name
+        ksort($fieldstosearch);
 
-        return $fieldsToSearch;
+        return $fieldstosearch;
     }
 
-    //Search for rows which match the search query
-    //Returns an associative array of the tables that were searched
-    private function runSearch() {
+    /**
+     * Search for rows which match the search query
+     * @return array An associative array of the tables that were searched
+     */
+    private function run_search() {
 
         if (empty($this->q)) {
             throw new Exception('No query was given.');
         }
 
-        $startTime = DataManager::getDebugTime();
+        $starttime = DataManager::get_debug_time();
 
-        //Check if cached shared results exist
-        $cache_for = get_config('block_search', 'cache_results');
-        $cache = $cache_for > 0 ? true : false;
+        // Check if cached shared results exist.
+        $cachefor = get_config('block_search', 'cache_results');
+        $cache = $cachefor > 0 ? true : false;
 
         if ($cache) {
 
-            $hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseID);
+            $hash = md5('search' . strtolower($this->q) . 'courseid' . $this->courseid);
 
-            if (!$this->refreshCache) {
-                //Check if cached results exists
-                $results = DataManager::getCache()->get($hash);
+            if (!$this->refreshcache) {
+                // Check if cached results exists.
+                $results = DataManager::get_cache()->get($hash);
 
                 if (is_array($results)) {
 
-                    //If the cached results are newer than than the cache_results setting we'll use them
-                    if ($results['generated'] > (time() - (int)$cache_for)) {
-                        $results['searchTime'] = DataManager::debugTimeTaken($startTime);
+                    // If the cached results are newer than than the cache_results setting we'll use them.
+                    if ($results['generated'] > (time() - (int)$cachefor)) {
+                        $results['searchTime'] = DataManager::get_debug_time_taken($starttime);
                         $results['cached'] = true;
                         return $results;
                     }
@@ -178,104 +178,104 @@ class Search
             }
         }
 
-        //Set the tables to search in
-        $this->tables = $this->getFieldsToSearch();
+        // Set the tables to search in.
+        $this->tables = $this->get_fields_to_search();
         if (empty($this->tables)) {
             throw new Exception('Trying to search, but no tables have been specified to search in.');
         }
 
-        //The results array to be returned
+        // The results array to be returned.
         $results = array(
-            'tables' => array(), //Number of results from each table, and the index that they start and end
-            'results' => array(), //Array of results
-            'generated' => time(), //Time the search was made
-            'searchTime' => 0, //How long the search took
-            'cached' => false, //Are the results cached?
-            'total' => 0, //Total number of results
-            'filtered' => false, //Have the results been personalised for a user yet?
+            'tables' => array(), // Number of results from each table, and the index that they start and end.
+            'results' => array(), // Array of results.
+            'generated' => time(), // Time the search was made.
+            'searchTime' => 0, // How long the search took.
+            'cached' => false, // Are the results cached?
+            'total' => 0, // Total number of results.
+            'filtered' => false, // Have the results been personalised for a user yet?
         );
 
-        //Search each table we're supposed to search in
-        foreach ($this->tables as $tableName => $fields) {
+        // Search each table we're supposed to search in.
+        foreach ($this->tables as $tablename => $fields) {
 
-            if ($tableName == 'folder_files') {
-                $rows = $this->searchFolderFiles();
+            if ($tablename == 'folder_files') {
+                $rows = $this->search_folder_files();
             } else {
-                $rows = $this->searchTable($tableName, $fields);
+                $rows = $this->search_table($tablename, $fields);
             }
 
             if (!empty($rows)) {
-                //Add the rows to the results ($results['results']) is a reference)
-                $this->convertRowsToResultObjectsAndAddToArray($tableName, $rows, $results['results']);
+                // Add the rows to the results ($results['results']) is a reference)
+                $this->convert_rows_to_result_objects_and_add_to_array($tablename, $rows, $results['results']);
             }
         }
 
-        $this->addTableInfoToResults($results);
+        $this->add_table_info_to_results($results);
 
-        //Save in the cache
+        // Save in the cache.
         if ($cache) {
-            DataManager::getCache()->set($hash, $results);
+            DataManager::get_cache()->set($hash, $results);
         }
 
-        $results['searchTime'] = DataManager::debugTimeTaken($startTime);
+        $results['searchTime'] = DataManager::get_debug_time_taken($starttime);
 
         return $results;
     }
 
-    private function searchTable($tableName, $fields) {
+    private function search_table($tablename, $fields) {
 
         global $DB;
 
         $where = '';
 
-        //Array of query values
-        $queryParameters = array();
+        // Array of query values.
+        $queryparameters = array();
 
-        //Build the SQL query
-        foreach ($fields as $fieldName) {
-            $where .= $this->buildWordQuery($fieldName, $this->q, $queryParameters) . ' OR ';
+        // Build the SQL query.
+        foreach ($fields as $fieldmame) {
+            $where .= $this->build_word_query($fieldmame, $this->q, $queryparameters) . ' OR ';
         }
         $where = rtrim($where, 'OR ');
 
-        if ($this->courseID) {
+        if ($this->courseid) {
             $where = "({$where})";
             $where .= ' AND course = ?';
-            $queryParameters[] = $this->courseID;
+            $queryparameters[] = $this->courseid;
         }
 
-        //Full query
-        $sql = 'SELECT * FROM {' . $tableName . '} WHERE ' . $where;
+        // Full query.
+        $sql = 'SELECT * FROM {' . $tablename . '} WHERE ' . $where;
 
-        //Run the query and return the matched rows
-        return $DB->get_records_sql($sql, $queryParameters);
+        // Run the query and return the matched rows.
+        return $DB->get_records_sql($sql, $queryparameters);
     }
 
     /**
      * Create the appropriate Result object, given a row from a table
      */
-    private function convertRowsToResultObjectsAndAddToArray($tableName, $rows, &$results) {
+    private function convert_rows_to_result_objects_and_add_to_array($tablename, $rows, &$results) {
 
-        switch ($tableName) {
+        switch ($tablename) {
             case 'course':
-                $className = 'CourseResult';
+                $classname = 'CourseResult';
                 break;
 
             case 'course_categories':
-                $className = 'CategoryResult';
+                $classname = 'CategoryResult';
                 break;
 
             case 'folder_files':
-                $className = 'FileInFolderResult';
+                $classname = 'FileInFolderResult';
                 break;
 
             default:
-                $className = 'ModuleResult';
+                $classname = 'ModuleResult';
                 break;
         }
-        $className = '\block_search\Models\\' . $className;
+        $classname = '\block_search\Models\\' . $classname;
 
         foreach ($rows as $row) {
-            $results[] = new $className($tableName, $row);
+            $results[] = new $classname($tablename, $row);
         }
     }
 
@@ -285,7 +285,7 @@ class Search
      * This is a bit more complicated than a simple search, hence the separate method
      * @return [type] [description]
      */
-    private function searchFolderFiles() {
+    private function search_folder_files() {
 
         global $DB;
 
@@ -323,20 +323,18 @@ class Search
             (
         ";
 
-        $queryParameters = array();
-        $sql .= $this->buildWordQuery('files.filename', $this->q, $queryParameters);
+        $queryparameters = array();
+        $sql .= $this->build_word_query('files.filename', $this->q, $queryparameters);
 
         $sql .= "
         )";
 
-        if ($this->courseID) {
+        if ($this->courseid) {
             $sql .= ' AND course_modules.course = ?';
-            $queryParameters[] = $this->courseID;
+            $queryparameters[] = $this->courseid;
         }
 
-        $fileResults = $DB->get_records_sql($sql, $queryParameters);
-
-        return $fileResults;
+        return $DB->get_records_sql($sql, $queryparameters);
     }
 
     /**
@@ -347,178 +345,178 @@ class Search
      * returns
      * ( columnName LIKE %two%' AND columnName LIKE %words% )
      */
-    private function buildWordQuery($columnName, $searchTerms, &$queryParameters = array()) {
+    private function build_word_query($columnname, $searchterms, &$queryparameters = array()) {
 
-        $searchTerms = strtolower($searchTerms);
+        $searchterms = strtolower($searchterms);
 
-        $columnName = "LOWER({$columnName})";
+        $columnname = "LOWER({$columnname})";
 
-        //Replace character for wildcards
-        $searchTerms = str_replace('*', '%', $searchTerms);
+        // Replace character for wildcards.
+        $searchterms = str_replace('*', '%', $searchterms);
 
-        // "Words in quotes" to search exact phrases
-        $queryExact = '';
-        if (preg_match_all('/"[\w|\s|\']+"/i', $searchTerms, $matches)) {
+        // "Words in quotes" to search exact phrases.
+        $queryexact = '';
+        if (preg_match_all('/"[\w|\s|\']+"/i', $searchterms, $matches)) {
             foreach ($matches[0] as $match) {
-                $queryExact .= "{$columnName} LIKE ? AND ";
+                $queryexact .= "{$columnname} LIKE ? AND ";
 
-                //Remove the match from the search terms because we're done with it
-                $searchTerms = str_replace($match, '', $searchTerms);
+                // Remove the match from the search terms because we're done with it.
+                $searchterms = str_replace($match, '', $searchterms);
 
-                //Remove quotes from the match
+                // Remove quotes from the match.
                 $match = trim($match, '"');
-                $queryParameters[] = '%' . $match . '%';
+                $queryparameters[] = '%' . $match . '%';
             }
         }
-        // -Word to exclude words
-        $queryExclude = '';
-        if (preg_match_all('/\-\w+/i', $searchTerms, $matches)) {
+        // -Word to exclude words.
+        $queryexclude = '';
+        if (preg_match_all('/\-\w+/i', $searchterms, $matches)) {
             foreach ($matches[0] as $match) {
 
-                $queryExclude .= "{$columnName} NOT LIKE ? AND ";
+                $queryexclude .= "{$columnname} NOT LIKE ? AND ";
 
-                //Remove the match from the search terms because we're done with it
-                $searchTerms = str_replace($match, '', $searchTerms);
+                // Remove the match from the search terms because we're done with it.
+                $searchterms = str_replace($match, '', $searchterms);
 
-                //Remove - from the match
+                // Remove - from the match.
                 $match = ltrim($match, '-');
-                $queryParameters[] = '%' . $match . '%';
+                $queryparameters[] = '%' . $match . '%';
             }
         }
 
-        //Now the advanced parameters have been dealt with and removed from $searchTerms
-        //We're just left with words we want to look for
-        $queryWords = '';
-        $searchTerms = trim($searchTerms);
-        $searchWords = explode(' ', trim($searchTerms));
+        // Now the advanced parameters have been dealt with and removed from $searchterms
+        // we're just left with words we want to look for.
+        $querywords = '';
+        $searchterms = trim($searchterms);
+        $searchwords = explode(' ', trim($searchterms));
 
-        $searchWords = array_unique($searchWords);
+        $searchwords = array_unique($searchwords);
 
-        foreach ($searchWords as $word) {
+        foreach ($searchwords as $word) {
             if (empty($word)) {
                 continue;
             }
 
-            $queryWords .= "({$columnName} LIKE ?";
-            $queryParameters[] = '%' . $word . '%';
+            $querywords .= "({$columnname} LIKE ?";
+            $queryparameters[] = '%' . $word . '%';
 
-            foreach ($this->getTextSubstitutions($word) as $sub) {
-                $queryWords .= " OR {$columnName} LIKE ?";
-                $queryParameters[] = '%' . $sub . '%';
+            foreach ($this->get_text_substitutions($word) as $sub) {
+                $querywords .= " OR {$columnname} LIKE ?";
+                $queryparameters[] = '%' . $sub . '%';
             }
 
-            $queryWords .= ') AND ';
+            $querywords .= ') AND ';
         }
 
-        //Now stick it together
-        $where = '(' . $queryExact . $queryExclude . $queryWords;
+        // Now stick it together.
+        $where = '(' . $queryexact . $queryexclude . $querywords;
         $where = rtrim($where, 'AND ') . ')';
 
         return $where;
     }
 
-    private function addTableInfoToResults(&$results) {
+    private function add_table_info_to_results(&$results) {
 
-        //Total number of results
+        // Total number of results.
         $results['total'] = count($results['results']);
         $results['tables'] = array();
-        $currentTable = false;
+        $currenttable = false;
 
-        $perPage = (int)get_config('block_search', 'results_per_page');
+        $perpage = (int)get_config('block_search', 'results_per_page');
         $i = 0;
         foreach ($results['results'] as $result) {
-            if ($currentTable === false || $result->tableName != $currentTable) {
-                $results['tables'][$result->tableName] = array(
+            if ($currenttable === false || $result->tablename != $currenttable) {
+                $results['tables'][$result->tablename] = array(
                     'count' => 0,
                     'visibleCount' => 0,
                     'hiddenCount' => 0,
                     'startIndex' => $i,
-                    'startPage' => floor($i / $perPage),
+                    'startPage' => floor($i / $perpage),
                 );
-                $currentTable = $result->tableName;
+                $currenttable = $result->tablename;
             }
 
-            ++$results['tables'][$result->tableName]['count'];
+            ++$results['tables'][$result->tablename]['count'];
             if ($result->hidden) {
-                ++$results['tables'][$result->tableName]['hiddenCount'];
+                ++$results['tables'][$result->tablename]['hiddenCount'];
             } else {
-                ++$results['tables'][$result->tableName]['visibleCount'];
+                ++$results['tables'][$result->tablename]['visibleCount'];
             }
-            $results['tables'][$result->tableName]['endIndex'] = $i;
+            $results['tables'][$result->tablename]['endIndex'] = $i;
             ++$i;
         }
     }
 
     /**
-  * Go through the array of results and remove those the user doesn't have permission to see
-  */
-    public function filterResults($removeHiddenResults = true) {
+     * Go through the array of results and remove those the user doesn't have permission to see
+     */
+    public function filter_results($removehiddenresults = true) {
 
-        //Site admin can see everything so don't bother filtering
+        // Site admin can see everything so don't bother filtering.
         if (is_siteadmin()) {
             return;
         }
 
         $this->results['filtered'] = time();
 
-        $startTime = DataManager::getDebugTime();
+        $starttime = DataManager::get_debug_time();
 
-        //Check if each result is visible
+        // Check if each result is visible.
         foreach ($this->results['results'] as $i => &$result) {
-            $visible = $result->isVisible();
+            $visible = $result->is_visible();
             if ($visible === null) {
 
-                //null means it should never be displayed
+                // Null means it should never be displayed.
                 unset($this->results['results'][$i]);
 
             } else if ($visible !== true) {
-                if ($removeHiddenResults) {
+                if ($removehiddenresults) {
                     unset($this->results['results'][$i]);
                 } else {
-                    $result->hiddenReason = $visible;
+                    $result->hiddenreason = $visible;
                     $result->hidden = true;
                 }
             }
         }
 
-        //Unset hanging references
+        // Unset hanging references.
         unset($result);
 
-        $this->addTableInfoToResults($this->results);
+        $this->add_table_info_to_results($this->results);
 
-        if (!$removeHiddenResults) {
+        if (!$removehiddenresults) {
             // Hidden results are included, but we want them to go to the bottom
             // Sort the results by 'tableName' then by 'hidden'
-            $this->results['results'] = Utils::sortMultidimensionalArray($this->results['results'], "tableName ASC, hidden ASC");
+            $this->results['results'] = Utils::sort_multidimensional_array($this->results['results'], "tableName ASC, hidden ASC");
         }
 
-        $this->results['filterTime'] = DataManager::debugTimeTaken($startTime);
+        $this->results['filterTime'] = DataManager::get_debug_time_taken($starttime);
     }
 
-    private function getTextSubstitutions($word) {
+    private function get_text_substitutions($word) {
 
-        //Load the substitutions if not already loaded
-        if (is_null($this->textSubstitutions)) {
-            $this->textSubstitutions = array();
+        // Load the substitutions if not already loaded.
+        if (is_null($this->textsubstitutions)) {
+            $this->textsubstitutions = array();
 
             $config = trim(get_config('block_search', 'text_substitutions'));
             if (strlen($config) > 0) {
 
-                //Split into lines
+                // Split into lines.
                 $config = explode("\n", $config);
 
                 foreach ($config as $line) {
                     $line = strtolower($line);
                     $line = trim($line, " \r\n");
                     list($find, $replace) = explode(' => ', $line);
-                    $this->textSubstitutions[$find][] = $replace;
+                    $this->textsubstitutions[$find][] = $replace;
                 }
 
             }
         }
 
-        if (isset($this->textSubstitutions[$word])) {
-            return $this->textSubstitutions[$word];
+        if (isset($this->textsubstitutions[$word])) {
+            return $this->textsubstitutions[$word];
         } else {
             return array();
         }

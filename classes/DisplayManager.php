@@ -29,50 +29,47 @@ use html_writer;
 class DisplayManager
 {
     private $block;
-    public $displayTime = 0;
 
     public function __construct(Block $block) {
 
         $this->block = $block;
     }
 
-    public function showSearchBox(
+    public function show_search_box(
         $q = false,
-        $courseID = false,
-        $searchInCourse = false,
-        $showAllResults = false,
-        $showOptions = true,
-        $placeholderText = null
+        $courseid = false,
+        $searchincourse = false,
+        $showallresults = false,
+        $showoptions = true,
+        $placeholdertext = null
     ) {
         global $SITE;
 
-        //Begin form
         $r = html_writer::start_tag(
             'form',
             array(
-                'action' => $this->block->getFullURL(),
+                'action' => $this->block->get_full_url(),
                 'method' => 'get',
-                'class' => 'searchBlockForm'
+                'class' => 'block-search-form'
             )
         );
 
-        if ($placeholderText === null) {
-            $placeholderText = $this->str('search_input_text_page');
+        if ($placeholdertext === null) {
+            $placeholdertext = $this->str('search_input_text_page');
         }
 
-        //Input box
+        // Input box.
         $r .= html_writer::empty_tag(
             'input',
             array(
                 'type' => 'text',
-                'placeholder' => $placeholderText,
+                'placeholder' => $placeholdertext,
                 'value' => $q,
-                'class' => 'searchBlockInput',
                 'name' => 'q'
             )
         );
 
-        //Search Button
+        // Search Button.
         $icon = html_writer::tag('i', '', array('class' => 'fa fa-search'));
         $r .= html_writer::tag(
             'button',
@@ -80,73 +77,73 @@ class DisplayManager
             array('class' => 'searchButton')
         );
 
-        if ($showOptions) {
+        if ($showoptions) {
 
             $r .= html_writer::start_tag('div', array('class' => 'options'));
 
-            $allowNoAccess = get_config('block_search', 'allow_no_access');
-            $showOptionsTitle = $allowNoAccess || !empty($courseID);
+            $allownoaccess = get_config('block_search', 'allow_no_access');
+            $showoptionstitle = $allownoaccess || !empty($courseid);
 
-            if ($showOptionsTitle) {
+            if ($showoptionstitle) {
                 $icon = html_writer::tag('i', '', array('class' => 'fa fa-cogs'));
                 $r .= '<strong>' . $icon . ' ' . $this->str('search_options') . '</strong>';
             }
 
-            //If courseID is in the URL, show options to search this course or everywhere
-            if ($courseID) {
+            // If courseID is in the URL, show options to search this course or everywhere.
+            if ($courseid) {
 
-                // hidden courseID field
+                // Hidden courseID field.
                 $r .= html_writer::empty_tag('input', array(
                     'type' => 'hidden',
                     'name' => 'courseID',
-                    'value' => $courseID
+                    'value' => $courseid
                 ));
 
-                $inputParams = array(
+                $inputparams = array(
                         'type' => 'radio',
                         'name' => 'searchInCourse',
                         'value' => 0,
                 );
-                if (!$searchInCourse) {
-                    $inputParams['checked'] = 'checked';
+                if (!$searchincourse) {
+                    $inputparams['checked'] = 'checked';
                 }
 
                 $r .= html_writer::tag(
                     'label',
-                    html_writer::empty_tag('input', $inputParams) . $this->str('search_all_of_site', $SITE->shortname)
+                    html_writer::empty_tag('input', $inputparams) . $this->str('search_all_of_site', $SITE->shortname)
                 );
 
-                $inputParams = array(
+                $inputparams = array(
                         'type' => 'radio',
                         'name' => 'searchInCourse',
                         'value' => 1
                 );
-                if ($searchInCourse) {
-                    $inputParams['checked'] = 'checked';
+                if ($searchincourse) {
+                    $inputparams['checked'] = 'checked';
                 }
 
-                $courseName = DataManager::getCourseName($courseID);
+                $coursename = DataManager::get_course_name($courseid);
                 $r .= html_writer::tag(
                     'label',
-                    html_writer::empty_tag('input', $inputParams) . $this->str('search_in_course', $courseName)
+                    html_writer::empty_tag('input', $inputparams) . $this->str('search_in_course', $coursename)
                 );
 
             }
 
-            if ($allowNoAccess) {
-                //"Show hidden results" button
-                //We need to make this an array so 'checked' can only be added if necessary
-                $checkboxAttributes = array(
+            if ($allownoaccess) {
+                // "Show hidden results" button
+                // We need to make this an array so 'checked' can only be added if necessary.
+                $checkboxattributes = array(
                     'type' => 'checkbox',
                     'name' => 'showHiddenResults',
                     'value' => 1,
                 );
 
-                if ($showAllResults) {
-                    $checkboxAttributes['checked'] = 'checked';
+                if ($showallresults) {
+                    $checkboxattributes['checked'] = 'checked';
                 }
 
-                $checkbox = html_writer::empty_tag('input', $checkboxAttributes);
+                $checkbox = html_writer::empty_tag('input', $checkboxattributes);
 
                 $r .= html_writer::tag(
                     'label',
@@ -156,15 +153,15 @@ class DisplayManager
 
             $r .= html_writer::end_tag('div');
 
-        } else if ($courseID) {
+        } else if ($courseid) {
 
-            //If we're not showing the options, but have a courseID we still need to add that to the form
+            // If we're not showing the options, but have a courseID we still need to add that to the form.
             $r .= html_writer::empty_tag(
                 'input',
                 array(
                     'type' => 'hidden',
                     'name' => 'courseID',
-                    'value' => $courseID
+                    'value' => $courseid
                 )
             );
 
@@ -176,8 +173,13 @@ class DisplayManager
     }
 
 
-    //Shows the 'quick jump' box on the left of the results page
-    public function showResultsNav($results, $currentPage) {
+    /**
+     * Returns the HTML for the 'quick jump' box on the left of the results page.
+     * @param  array $results
+     * @param  int $currentpage
+     * @return string
+     */
+    public function show_results_nav($results, $currentpage) {
 
         $r = html_writer::start_tag('div', array('id' => 'resultsNav', 'class' => 'block'));
 
@@ -190,36 +192,36 @@ class DisplayManager
         $r .= html_writer::start_tag('div', array('class' => 'content'));
         $r .= html_writer::start_tag('ul');
 
-        foreach ($results['tables'] as $tableName => $tableInfo) {
-            if ($tableInfo['count'] < 1) {
+        foreach ($results['tables'] as $tablename => $tableinfo) {
+            if ($tableinfo['count'] < 1) {
                 continue;
             }
-            $sectionDetails = $this->tableName($tableName);
+            $sectiondetails = $this->get_nice_table_name($tablename);
 
-            if ($tableInfo['hiddenCount'] > 0) {
-                $countLabel = html_writer::tag(
+            if ($tableinfo['hiddenCount'] > 0) {
+                $countlabel = html_writer::tag(
                     'span',
-                    $tableInfo['visibleCount'] . ' + ' . $tableInfo['count'] . ' hidden'
+                    $tableinfo['visibleCount'] . ' + ' . $tableinfo['count'] . ' hidden'
                 );
             } else {
-                $countLabel = html_writer::tag(
+                $countlabel = html_writer::tag(
                     'span',
-                    $tableInfo['visibleCount']
+                    $tableinfo['visibleCount']
                 );
             }
 
-            if ($tableInfo['startPage'] == $currentPage) {
-                $href = "#searchresults-{$tableName}";
+            if ($tableinfo['startPage'] == $currentpage) {
+                $href = "#searchresults-{$tablename}";
             } else {
                 global $PAGE;
                 $url = clone ($PAGE->url);
-                $url->param('page', $tableInfo['startPage']);
-                $href = $url->out(false) . "#searchresults-{$tableName}";
+                $url->param('page', $tableinfo['startPage']);
+                $href = $url->out(false) . "#searchresults-{$tablename}";
             }
 
             $a = html_writer::tag(
                 'a',
-                $countLabel . $sectionDetails['icon'] . $sectionDetails['title'],
+                $countlabel . $sectiondetails['icon'] . $sectiondetails['title'],
                 array('href' => $href)
             );
 
@@ -233,64 +235,69 @@ class DisplayManager
         return $r;
     }
 
-    public function sliceResultsForPage($results, $pageNum) {
+    public function slice_results_for_page($results, $pagenum) {
 
-        $perPage = (int)get_config('block_search', 'results_per_page');
-        $offset = $pageNum * $perPage;
-        return array_splice($results, $offset, $perPage);
+        $perpage = (int)get_config('block_search', 'results_per_page');
+        $offset = $pagenum * $perpage;
+        return array_splice($results, $offset, $perpage);
     }
 
-    //Takes the result set from a search and makes HTML to show it nicely
-    public function showResults($results, $pageNum = 0, $currentTable = false) {
+    /**
+     * Takes the result set from a search and makes HTML to show it nicely
+     */
+    public function show_results($results, $pagenum = 0, $currenttable = false) {
 
-        $startTime = DataManager::getDebugTime();
+        $starttime = DataManager::get_debug_time();
 
-        $results = $this->sliceResultsForPage($results, $pageNum);
+        $results = $this->slice_results_for_page($results, $pagenum);
 
         $r = '';
 
         foreach ($results as $result) {
 
-            if ($currentTable === false || $result->tableName != $currentTable) {
+            if ($currenttable === false || $result->tablename != $currenttable) {
 
-                //Start of a new section in results
+                // Start of a new section in results.
 
-                if ($currentTable !== false) {
-                    //Close the previous section
+                if ($currenttable !== false) {
+                    // Close the previous section.
                     $r .= html_writer::end_tag('ul');
                 }
 
-                //Section header in results
-                $sectionDetails = $this->tableName($result->tableName);
+                // Section header in results.
+                $sectiondetails = $this->get_nice_table_name($result->tablename);
                 $r .= html_writer::tag(
                     'h3',
-                    $sectionDetails['icon'] . ' ' . $sectionDetails['title'],
-                    array('id' => 'searchresults-' . $result->tableName)
+                    $sectiondetails['icon'] . ' ' . $sectiondetails['title'],
+                    array('id' => 'searchresults-' . $result->tablename)
                 );
 
-                //Show results from this table
+                // Show results from this table.
                 $r .= html_writer::start_tag('ul', array('class' => 'results'));
 
-                $currentTable = $result->tableName;
+                $currenttable = $result->tablename;
             }
 
-            $r .= $this->showResult($result->tableName, $result, $sectionDetails['icon']);
+            $r .= $this->show_result($result->tablename, $result, $sectiondetails['icon']);
         }
 
         $r .= html_writer::end_tag('ul');
 
-        $this->displayTime = DataManager::debugTimeTaken($startTime);
+        $this->displayTime = DataManager::get_debug_time_taken($starttime);
 
         return $r;
     }
 
-    //Takes the name of a table and returns a nice human readable name
-    //Mostly this replaces a module name (which is also a table name) with the title of that module
-    private function tableName($tableName) {
+    /**
+     * Takes the name of a table and returns a nice human readable name.
+     * @param  string $tablename
+     * @return string
+     */
+    private function get_nice_table_name($tablename) {
 
         global $OUTPUT;
 
-        switch ($tableName) {
+        switch ($tablename) {
             case 'course_categories':
                 return array(
                     'title' => get_string('categories', 'moodle'),
@@ -310,53 +317,55 @@ class DisplayManager
                 );
                 break;
             default:
-                if ($pluginName = get_string('pluginname', "mod_{$tableName}")) {
+                if ($pluginname = get_string('pluginname', "mod_{$tablename}")) {
                     return array(
-                        'title' => $pluginName,
-                        'icon' => trim($OUTPUT->pix_icon('icon', '', $tableName, array('class' => 'icon')))
+                        'title' => $pluginname,
+                        'icon' => trim($OUTPUT->pix_icon('icon', '', $tablename, array('class' => 'icon')))
                     );
                 } else {
                     return array(
-                        'title' => $tableName, //oops no localization
+                        'title' => $tablename,
                         'icon' => html_writer::tag('i', '', array('class' => 'fa fa-certificate'))
                     );
                 }
         }
     }
 
-    //Gets all the information needed to show a row nicely in the search results
-    // e.g. gets the "path" to an activity, the URL, the icon etc.
-    private function showResult($tableName, $result, $defaultSectionIcon = false) {
+    /**
+     * Gets all the information needed to show a row nicely in the search results
+     * e.g. gets the "path" to an activity, the URL, the icon etc.
+     */
+    private function show_result($tablename, $result, $defaultsectionicon = false) {
 
-        $liClasses = '';
+        $liclasses = '';
 
         if ($result->hidden) {
-            $liClasses .= ' hideresult';
+            $liclasses .= ' hideresult';
         }
 
-        $r = html_writer::start_tag('li', array('class' => $liClasses));
+        $r = html_writer::start_tag('li', array('class' => $liclasses));
 
-        //Show the path
-        $r .= html_writer::tag('ul', $this->showPath($result->path()), array('class' => 'path'));
+        // Show the path.
+        $r .= html_writer::tag('ul', $this->show_path($result->path()), array('class' => 'path'));
 
-        if (!empty($result->hiddenReason)) {
-            if ($result->hiddenReason == 'notenrolled') {
-                $niceHiddenReason = $this->str('hidden_not_enrolled');
-            } else if ($result->hiddenReason == 'notvisible') {
-                $niceHiddenReason = $this->str('hidden_not_available');
+        if (!empty($result->hiddenreason)) {
+            if ($result->hiddenreason == 'notenrolled') {
+                $nicehiddenreason = $this->str('hidden_not_enrolled');
+            } else if ($result->hiddenreason == 'notvisible') {
+                $nicehiddenreason = $this->str('hidden_not_available');
             }
 
-            $hiddenIcon = html_writer::tag('i', '', array('class' => 'fa fa-times'));
+            $hiddenicon = html_writer::tag('i', '', array('class' => 'fa fa-times'));
             $r .= html_writer::tag(
                 'h5',
-                $hiddenIcon . ' ' .$niceHiddenReason,
-                array('class' => 'hiddenReason')
+                $hiddenicon . ' ' . $nicehiddenreason,
+                array('class' => 'hiddenreason')
             );
         }
 
         $icon = $result->icon();
         if (!$icon) {
-            $icon = $defaultSectionIcon;
+            $icon = $defaultsectionicon;
         }
 
         $r .= html_writer::tag(
@@ -370,7 +379,7 @@ class DisplayManager
 
         if ($d = $result->description()) {
             $d = strip_tags($d);
-            $d = $this->wordTruncate($d, 350);
+            $d = $this->word_truncate($d, 350);
             $r .= html_writer::tag('p', $d);
         }
 
@@ -379,7 +388,7 @@ class DisplayManager
         return $r;
     }
 
-    private function showPath($path) {
+    private function show_path($path) {
 
         $r = '';
         foreach ($path as $item) {
@@ -404,7 +413,7 @@ class DisplayManager
      * @param    string $cutter        Sting to append to text if it gets truncated
      * @return string    Truncated text
      */
-    private function wordTruncate($string, $limit, $cutter = '...') {
+    private function word_truncate($string, $limit, $cutter = '...') {
 
         if (strlen($string) <= $limit) {
             return $string;
@@ -415,7 +424,8 @@ class DisplayManager
         $string = substr($string, 0, $limit);
         $string = trim($string, " ,.");
 
-        $breakpoint = strrpos($string, ' '); //Find last space in truncated string
+        // Find last space in truncated string.
+        $breakpoint = strrpos($string, ' ');
 
         if ($breakpoint === false) {
             return $string.$cutter;
@@ -429,7 +439,7 @@ class DisplayManager
     /**
      * Returns the HTML for displaying the advanced search options to the user
      */
-    public function showAdvancedOptions() {
+    public function show_advanced_options() {
 
         $r = '<div class="advancedOptions">'
             . '<h4><i class="fa fa-crosshairs"></i> '. $this->str('advanced_search_title') . '</h4>'
@@ -449,7 +459,6 @@ class DisplayManager
 
     /**
      * Shortcut to get_string from the block.
-     * (Only supports one parameter though)
      */
     private function str($name, $params = false) {
 

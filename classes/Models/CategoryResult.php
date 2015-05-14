@@ -30,8 +30,8 @@ class CategoryResult extends Result
     public function icon() {
 
         if (function_exists('\course_get_category_icon')) {
-            $categoryIcon = \course_get_category_icon($this->row->id);
-            return html_writer::tag('i', '', array('class' => 'fa fa-' . $categoryIcon));
+            $categoryicon = \course_get_category_icon($this->row->id);
+            return html_writer::tag('i', '', array('class' => 'fa fa-' . $categoryicon));
         } else {
             return html_writer::tag('i', '', array('class' => 'fa fa-folder-open'));
         }
@@ -47,12 +47,12 @@ class CategoryResult extends Result
         if ($this->row->depth <= 1) {
             return array();
         } else {
-            //Get the names of parent categories
-            return $this->getCategoryPath($this->row->id, $this->row->path, true);
+            // Get the names of parent categories.
+            return $this->get_category_path($this->row->id, $this->row->path, true);
         }
     }
 
-    public function isVisible() {
+    public function is_visible() {
 
         return true;
     }

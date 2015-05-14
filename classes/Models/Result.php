@@ -30,13 +30,13 @@ use moodle_url;
 abstract class Result
 {
     protected $row;
-    public $tableName;
+    public $tablename;
     public $hidden = false;
-    public $hiddenReason = '';
+    public $hiddenreason = '';
 
-    public function __construct($tableName, $row) {
+    public function __construct($tablename, $row) {
 
-        $this->tableName = $tableName;
+        $this->tablename = $tablename;
         $this->row = $row;
     }
 
@@ -55,9 +55,11 @@ abstract class Result
     // The name of a language string containing an error message if not
     // Or null if it should never be displayed to anybody (if it's broken - because the course
     // it's in is missing for example)
-    abstract public function isVisible();
+    abstract public function is_visible();
 
-    // Gives a human readable name for a result row
+    /**
+     * Returns a human readable name for a result row
+     */
     public function name() {
 
         return $this->row->name;
@@ -74,52 +76,52 @@ abstract class Result
         return trim($d);
     }
 
-    protected function getCategoryPath($categoryID, $pathString = null, $removeLastCategory = false) {
+    protected function get_category_path($categoryid, $pathstring = null, $removelastcategory = false) {
 
         global $DB;
 
-        if (is_null($pathString)) {
-            $pathString = $DB->get_field('course_categories', 'path', array('id' => $categoryID));
+        if (is_null($pathstring)) {
+            $pathstring = $DB->get_field('course_categories', 'path', array('id' => $categoryid));
         }
 
-        $categoryIDs = explode('/', $pathString);
+        $categoryids = explode('/', $pathstring);
 
-        //Remove the first item
-        //(will be empty because the path string starts with /)
-        array_shift($categoryIDs);
+        // Remove the first item.
+        // (will be empty because the path string starts with /)
+        array_shift($categoryids);
 
-        if ($removeLastCategory) {
-            //Remove the last item
-            //(would cause the name to be duplicated if shown for a category result)
-            array_pop($categoryIDs);
+        if ($removelastcategory) {
+            // Remove the last item
+            // (would cause the name to be duplicated if shown for a category result)
+            array_pop($categoryids);
         }
 
-        if (count($categoryIDs) < 1) {
+        if (count($categoryids) < 1) {
             return array();
         }
 
         $path = array();
-        foreach ($categoryIDs as $categoryID) {
+        foreach ($categoryids as $categoryid) {
 
-            // This is really an SSIS tweak, but if your Moodle has this function to find
-            // and icon to use for a category it should return the name of a fontawesome 4 icon here
+            // If your Moodle has this function to find
+            // an icon to use for a category it should return the name of a fontawesome 4 icon here
             if (function_exists('\course_get_category_icon')) {
-                $categoryIcon = \course_get_category_icon($categoryID);
+                $categoryicon = \course_get_category_icon($categoryid);
             } else {
-                $categoryIcon = false;
+                $categoryicon = false;
             }
             $path[] = array(
                 'title' => 'Category',
-                'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryID)),
-                'url' => new moodle_url('/course/index.php', array('categoryid' => $categoryID)),
-                'icon' => !empty($categoryIcon) ? 'fa fa-'.$categoryIcon : 'fa fa-folder-open'
+                'name' => $DB->get_field('course_categories', 'name', array('id' => $categoryid)),
+                'url' => new moodle_url('/course/index.php', array('categoryid' => $categoryid)),
+                'icon' => !empty($categoryicon) ? 'fa fa-'.$categoryicon : 'fa fa-folder-open'
             );
         }
 
         return $path;
     }
 
-    public function getRow() {
+    public function get_row() {
 
         return $this->row;
     }
@@ -129,29 +131,17 @@ abstract class Result
      * An error string if not
      * null if the course doesn't exist
      */
-    protected function isCourseVisible($courseID) {
+    protected function is_course_visible($courseid) {
 
-        if (!$courseID) {
-            error_log(
-                "Found a result while searching that has no course ID" .
-                " Table: " . $this->tableName .
-                " ID in table: " . $this->row->id .
-                " CourseID: " . $courseID
-            );
+        if (!$courseid) {
             return null;
         }
 
         global $USER;
 
-        $coursecontext = context_course::instance($courseID, IGNORE_MISSING);
+        $coursecontext = context_course::instance($courseid, IGNORE_MISSING);
         if (!$coursecontext) {
-            //If the course ID is set, but doesn't exist
-            error_log(
-                "Found a result while searching, but its course doesn't exist!" .
-                " Table: " . $this->tableName .
-                " ID in table: " . $this->row->id .
-                " CourseID: " . $courseID
-            );
+            // If the course ID is set, but doesn't exist.
             return null;
         }
 

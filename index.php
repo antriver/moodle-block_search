@@ -37,6 +37,7 @@ $courseid = optional_param('courseid', 0, PARAM_INT);
 $searchincourse = optional_param('searchincourse', false, PARAM_BOOL);
 $pagenum = optional_param('page', 0, PARAM_INT);
 $showhiddenresults = optional_param('showhiddenresults', false, PARAM_BOOL);
+$refreshcache = optional_param('refreshcache', false, PARAM_BOOL);
 
 $perpage = (int)get_config('block_search', 'results_per_page');
 
@@ -75,22 +76,22 @@ if (!empty($q)) {
     }
 
 } else {
-    $PAGE->set_title(get_string('pagetitle', $searchblock->blockName));
+    $PAGE->set_title(get_string('pagetitle', $searchblock->blockname));
 }
 
-$PAGE->set_heading(get_string('pagetitle', $searchblock->blockName));
+$PAGE->set_heading(get_string('pagetitle', $searchblock->blockname));
 
 echo $OUTPUT->header();
-echo html_writer::start_tag('div', array('id' => $searchblock->blockName));
+echo html_writer::start_tag('div', array('id' => $searchblock->blockname));
 
-echo $searchblock->display->showSearchBox($q, $courseid, $searchincourse, $showhiddenresults);
+echo $searchblock->display->show_search_box($q, $courseid, $searchincourse, $showhiddenresults);
 
 if (!empty($q)) {
 
     $removehiddenresults = empty($showhiddenresults) ? true : false;
 
     // Do the search.
-    $results = $searchblock->search($q, ($searchincourse ? $courseid : false), $removehiddenresults);
+    $results = $searchblock->search($q, ($searchincourse ? $courseid : false), $removehiddenresults, $refreshcache);
 
     if (!empty($results['error'])) {
 
@@ -131,7 +132,7 @@ if (!empty($q)) {
         /**
          * Advanced Search Options
          */
-        echo $searchblock->display->showAdvancedOptions();
+        echo $searchblock->display->show_advanced_options();
 
     } else {
 
@@ -156,7 +157,7 @@ if (!empty($q)) {
          * Results menu (on the left)
          */
         echo html_writer::start_tag('div', array('class' => 'col left'));
-            echo $searchblock->display->showResultsNav($results, $pagenum);
+            echo $searchblock->display->show_results_nav($results, $pagenum);
 
             // This is here so the leftcol still has content (and doesn't collapse)
             // when the resultsNav becomes position:fixed when scrolling.
@@ -174,16 +175,20 @@ if (!empty($q)) {
              */
             $pagingbar = new paging_bar($results['total'], $pagenum, $perpage, $PAGE->url);
 
+            echo '<div class="text-center">';
             echo $OUTPUT->render($pagingbar);
+            echo '</div>';
 
-            echo $searchblock->display->showResults($results['results'], $pagenum);
+            echo $searchblock->display->show_results($results['results'], $pagenum);
 
+            echo '<div class="text-center">';
             echo $OUTPUT->render($pagingbar);
+            echo '</div>';
 
             /**
              * Advanced Search Options
              */
-            echo $searchblock->display->showAdvancedOptions();
+            echo $searchblock->display->show_advanced_options();
 
         echo html_writer::end_tag('div');
     }
@@ -195,7 +200,7 @@ if (!empty($q)) {
     /**
      * Advanced Search Options
      */
-    echo $searchblock->display->showAdvancedOptions();
+    echo $searchblock->display->show_advanced_options();
 
 }
 
@@ -244,8 +249,8 @@ echo html_writer::end_tag('div');
 /**
  * Javascript
  */
-echo '<script src="' . $searchblock->getFullURL() . 'assets/js/jquery.scrollTo.min.js?v=' . $searchblock->version() . '"></script>';
-echo '<script src="' . $searchblock->getFullURL() . 'assets/js/jquery.localScroll.min.js?v=' . $searchblock->version() . '"></script>';
-echo '<script src="' . $searchblock->getFullURL() . 'assets/js/block_search.js?v=' . $searchblock->version() . '"></script>';
+echo '<script src="' . $searchblock->get_full_url() . 'assets/js/jquery.scrollTo.min.js?v=' . $searchblock->version() . '"></script>';
+echo '<script src="' . $searchblock->get_full_url() . 'assets/js/jquery.localScroll.min.js?v=' . $searchblock->version() . '"></script>';
+echo '<script src="' . $searchblock->get_full_url() . 'assets/js/block_search.js?v=' . $searchblock->version() . '"></script>';
 
 echo $OUTPUT->footer();

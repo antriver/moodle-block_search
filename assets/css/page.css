@@ -30,18 +30,18 @@
 
 /* Search form */
 
-#block_search .searchBlockForm {
+#block_search .block-search-form {
 	display: block;
 	margin:0 0 20px 0;
 	margin:0;
 	text-align:center;
 	white-space: nowrap;
 }
-	.searchBlockForm .options {
+	.block-search-form .options {
 		white-space: normal;
 	}
 
-	.searchBlockForm label {
+	.block-search-form label {
 		font-size:12px;
 		display:inline-block;
 		margin-top:5px;
@@ -50,7 +50,7 @@
 		cursor:pointer;
 	}
 
-	.searchBlockForm input[type=text] {
+	.block-search-form input[type=text] {
 		-webkit-box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		box-sizing: border-box;
@@ -61,7 +61,7 @@
 		font-size:15px;
 	}
 
-	.searchBlockForm button {
+	.block-search-form button {
 		-webkit-box-sizing: border-box;
 		-moz-box-sizing: border-box;
 		box-sizing: border-box;
@@ -220,7 +220,7 @@
 			color:#AAA;
 		}
 
-	#block_search #results li h5.hiddenReason {
+	#block_search #results li h5.hiddenreason {
 		color:#AAA;
 		font-size:12px;
 		margin:5px 0;
