@@ -1,8 +1,22 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * @package    block_search
- * @copyright  Anthony Kuske <www.anthonykuske.com>
+ * @copyright  2015 Anthony Kuske <www.anthonykuske.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -11,22 +25,22 @@ namespace block_search;
 class Utils
 {
     /**
-    * @name Mutlidimensional Array Sorter.
-    * @author Tufan Barış YILDIRIM
-    * @link http://www.tufanbarisyildirim.com
-    * @github http://github.com/tufanbarisyildirim
-    *
-    * This function can be used for sorting a multidimensional array by sql like order by clause
-    *
-    * Tweaked to work with objects Feb 17th 2014
-    * @author Anthony Kuske <www.anthonykuske.com>
-    *
-    * @param mixed $array
-    * @param mixed $order_by
-    * @return array
-    */
-    public static function sortMultidimensionalArray(array $array, $order_by)
-    {
+     * @name Mutlidimensional Array Sorter.
+     * @author Tufan Barış YILDIRIM
+     * @link http://www.tufanbarisyildirim.com
+     * @github http://github.com/tufanbarisyildirim
+     *
+     * This function can be used for sorting a multidimensional array by sql like order by clause
+     *
+     * Tweaked to work with objects Feb 17th 2014
+     * @author Anthony Kuske <www.anthonykuske.com>
+     *
+     * @param mixed $array
+     * @param mixed $order_by
+     * @return array
+     */
+    public static function sortMultidimensionalArray(array $array, $order_by) {
+
         /*if(!is_array($array[0]))
            throw new Exception('$array must be a multidimensional array!',E_USER_ERROR);*/
 

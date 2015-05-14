@@ -1,10 +1,24 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * Main class for search block
  *
  * @package    block_search
- * @copyright  Anthony Kuske <www.anthonykuske.com>
+ * @copyright  2015 Anthony Kuske <www.anthonykuske.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -16,86 +30,86 @@ use block_search\Models\Search;
 
 class Block
 {
-	public $display;
-	public $blockName = 'block_search';
-	private $path = '/blocks/search/';
+    public $display;
+    public $blockName = 'block_search';
+    private $path = '/blocks/search/';
 
-	public function __construct()
-	{
-		// Classes are now autoloaded
+    public function __construct() {
 
-		$this->display = new DisplayManager($this);
-	}
+        // Classes are now autoloaded
 
-	public function getFullPath()
-	{
-		global $CFG;
-		return $CFG->dirroot . $this->path;
-	}
+        $this->display = new DisplayManager($this);
+    }
 
-	public function getFullURL()
-	{
-		return new moodle_url($this->path);
-	}
+    public function getFullPath() {
 
-	public function search($q, $courseID = 0, $removeHiddenResults = false)
-	{
-		if (strlen($q) < 2) {
-			return array(
-				'error' => get_string('error_query_too_short', 'block_search', 2)
-			);
-		}
+        global $CFG;
+        return $CFG->dirroot . $this->path;
+    }
 
-		raise_memory_limit(MEMORY_UNLIMITED);
+    public function getFullURL() {
 
-		//Check if user cached results exist
-		$userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
-		$useUserCache = $userCacheValidFor > 0;
+        return new moodle_url($this->path);
+    }
 
-		if (is_siteadmin()) {
-			$useUserCache = false;
-		}
+    public function search($q, $courseID = 0, $removeHiddenResults = false) {
 
-		if ($useUserCache) {
+        if (strlen($q) < 2) {
+            return array(
+                'error' => get_string('error_query_too_short', 'block_search', 2)
+            );
+        }
 
-			$cacheKey = md5(json_encode(array($q, $courseID, $removeHiddenResults)));
+        raise_memory_limit(MEMORY_UNLIMITED);
 
-			$userCache = cache::make('block_search', 'user_searches');
-			if ($results = $userCache->get($cacheKey)) {
+        //Check if user cached results exist
+        $userCacheValidFor = (int)get_config('block_search', 'cache_results_per_user');
+        $useUserCache = $userCacheValidFor > 0;
 
-				if ($results['filtered'] > (time() - (int)$userCacheValidFor)) {
-					$results['userCached'] = true;
-					return $results;
-				}
-			}
+        if (is_siteadmin()) {
+            $useUserCache = false;
+        }
 
-		}
+        if ($useUserCache) {
 
-		$search = new Search($q, $courseID);
-		$search->filterResults($removeHiddenResults);
-		$results = $search->getResults();
+            $cacheKey = md5(json_encode(array($q, $courseID, $removeHiddenResults)));
 
-		if ($useUserCache) {
-			$userCache->set($cacheKey, $results);
-		}
+            $userCache = cache::make('block_search', 'user_searches');
+            if ($results = $userCache->get($cacheKey)) {
 
-		return $results;
-	}
+                if ($results['filtered'] > (time() - (int)$userCacheValidFor)) {
+                    $results['userCached'] = true;
+                    return $results;
+                }
+            }
 
-	/**
-	 * Returns the version number of the plugin, from the version.php file
-	 *
-	 * As far as I can see there's no variable or constant that contains this already
-	 * so it includes the version.php file to read the version number from it.
-	 */
-	public function version()
-	{
-		if (isset($this->version)) {
-			return $this->version;
-		}
-		$plugin = new \stdClass;
-		include dirname(__DIR__) . '/version.php';
-		$this->version = $plugin->version;
-		return $this->version;
-	}
+        }
+
+        $search = new Search($q, $courseID);
+        $search->filterResults($removeHiddenResults);
+        $results = $search->getResults();
+
+        if ($useUserCache) {
+            $userCache->set($cacheKey, $results);
+        }
+
+        return $results;
+    }
+
+    /**
+     * Returns the version number of the plugin, from the version.php file
+     *
+     * As far as I can see there's no variable or constant that contains this already
+     * so it includes the version.php file to read the version number from it.
+     */
+    public function version() {
+
+        if (isset($this->version)) {
+            return $this->version;
+        }
+        $plugin = new \stdClass;
+        include dirname(__DIR__) . '/version.php';
+        $this->version = $plugin->version;
+        return $this->version;
+    }
 }

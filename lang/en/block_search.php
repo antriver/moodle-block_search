@@ -1,31 +1,51 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
  * English language strings for search block
  *
  * @package    block_search
- * @copyright  Anthony Kuske <www.anthonykuske.com>
+ * @copyright  2015 Anthony Kuske <www.anthonykuske.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//General blockyness
+/**
+ * General blockyness
+ */
 $string['pluginname'] = 'Search';
 $string['pagetitle'] = 'Search';
 $string['search'] = 'Search';
 
-//Placeholder text for the search box when shown in a block on a page
+// Placeholder text for the search box when shown in a block on a page.
 $string['search_input_text_block'] = 'Search this course';
 
-//Placeholder text for the search box when shown on the full search page
+// Placeholder text for the search box when shown on the full search page.
 $string['search_input_text_page'] = 'Find courses, activities, or documents';
 
-//Search form
+/**
+ * Search form
+ */
 $string['search_options'] = 'Search Options:';
 $string['search_all_of_site'] = 'Search all of {$a}';
 $string['search_in_course'] = 'Search in {$a} only';
 $string['include_hidden_results'] = 'Include results I don\'t have access to';
 
-//Search results
+/**
+ * Search results
+ */
 $string['error_query_too_short'] = 'Please enter a query at least {$a} characters long.';
 $string['search_results_for'] = 'Search Results for \'{$a}\'';
 $string['search_results'] = 'Search Results';
@@ -37,14 +57,18 @@ $string['hidden_not_enrolled'] = 'You are not enrolled in this course.';
 $string['hidden_not_available'] = 'This resource has not been made available to you.';
 $string['folder_contents'] = 'Files Inside Folders';
 
-//Search stats
+/**
+ * Search stats
+ */
 $string['search_took'] = 'Search took <strong>{$a}</strong> seconds.';
 $string['cached_results_generated'] = 'Cached results from <strong>{$a}</strong>.';
 $string['filtering_took'] = 'Filtering results took <strong>{$a}</strong> seconds.';
 $string['user_cached_results_generated'] = 'Personalised cached results from <strong>{$a}</strong>.';
 $string['displaying_took'] = 'Displaying results took <strong>{$a}</strong> seconds.';
 
-//Admin settings
+/**
+ * Admin settings
+ */
 $string['settings_search_tables_name'] = 'Search Tables';
 $string['settings_search_tables_desc'] = 'Which tables in the database will be searched.';
 $string['selectall'] = 'Select All';
@@ -69,8 +93,9 @@ Specify each replacement on it\'s own line in this format:
 App => Application
 Some Phrase => Some Much Longer Phrase</pre>';
 
-
-//Advanced Search Help
+/**
+ * Advanced Search Help
+ */
 $string['advanced_search_title'] = 'Advanced Search Options';
 $string['advanced_search_desc'] = 'Add these words to your search to refine the results.';
 
@@ -83,9 +108,13 @@ $string['advanced_search_exact_desc'] = 'Find results that contain this <strong>
 $string['advanced_search_wildcard_example'] = 'w*d';
 $string['advanced_search_wildcard_desc'] = '* is a <strong>wildcard</strong>. This would match both "word" and "weird".';
 
-//Capabilities
+/**
+ * Capabilities
+ */
 $string['search:search'] = 'Perform a search';
 
-// MUC
+/**
+ * MUC
+ */
 $string['cachedef_main'] = 'Main block searches';
 $string['cachedef_user_searches'] = 'User searches';
