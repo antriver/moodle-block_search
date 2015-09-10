@@ -1,4 +1,4 @@
-# Moodle Search Block Plugin
+# Moodle Search Plugin
 
 ## About
 This allows Moodle users to search for courses and resources.
