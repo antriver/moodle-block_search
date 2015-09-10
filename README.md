@@ -1,6 +1,4 @@
 # Moodle Search Plugin
-
-## About
 This allows Moodle users to search for courses and resources.
 Searches can be site-wide or in a specific course.
 Users can search from the search page (http://your.moodle.url/blocks/search), or you can add the search box as a Block to your course pages.
