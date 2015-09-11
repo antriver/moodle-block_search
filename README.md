@@ -5,6 +5,8 @@ Add a search function to your Moodle site. This allows Moodle users to search fo
 ![Screenshot of search page](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/1.png)
 ![Screenshot of results](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/2.png)
 ![Screenshot of results](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/3.png)
+![Admin settings](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/4.png)
+![Admin settings](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/5.png)
 
 ## Setup
 Simply clone the repo to your moodle/blocks directory
@@ -18,9 +20,6 @@ Visit http://your.moodle.url/blocks/search to perform a search.
 ## Settings
 Access the settings for the block at **Site Administration > Plugins > Blocks > Seach**
 Here you can choose which tables in the database to look for results in and change caching options (by default search results will be cached for 1 day).
-
-![Admin settings](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/4.png)
-![Admin settings](https://www.classroomtechtools.com/assets/img/moodle-plugin-screenshots/block_search/5.png)
 
 ## Important Note
 This is distributed with the hope that it will be helpful to others, but with no warranty or guarantee that it works  whatsoever. This should be treated as beta software and is likely to be buggy. Back up your data before isntalling, and use at your own risk! 
